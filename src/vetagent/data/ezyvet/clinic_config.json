@@ -1,0 +1,78 @@
+{
+  "_about": "App-owned settings for one clinic. Not ezyVet data: the clinic confirms these at onboarding.",
+  "clinic_name": "Northside Family Vets",
+  "timezone": "Australia/Sydney",
+  "lead_vet_user_id": "12",
+  "species": {
+    "Canine": "dog",
+    "Feline": "cat",
+    "Avian": "bird"
+  },
+  "price_products": {
+    "vaccination": "301",
+    "parasite_repeat": "302",
+    "heartworm": "303",
+    "senior_screening": "304",
+    "dental": "305",
+    "worming": "306"
+  },
+  "care_groups": {
+    "C5 Vaccination": {
+      "type": "vaccination"
+    },
+    "F3 Vaccination": {
+      "type": "vaccination"
+    },
+    "Senior Screening": {
+      "type": "screening"
+    },
+    "Heartworm": {
+      "type": "parasite",
+      "label": "Annual heartworm injection",
+      "price_key": "heartworm",
+      "product_id": "303",
+      "owner_given": false,
+      "lasts_days": 365
+    },
+    "Flea and Tick": {
+      "type": "parasite",
+      "label": "3-month flea and tick chew",
+      "price_key": "parasite_repeat",
+      "product_id": "302",
+      "owner_given": true,
+      "lasts_days": 90
+    },
+    "Intestinal Worming": {
+      "type": "parasite",
+      "label": "3-month worming tablet",
+      "price_key": "worming",
+      "product_id": "306",
+      "owner_given": true,
+      "lasts_days": 90
+    },
+    "Dental Procedure": {
+      "type": "dental",
+      "label": "Dental recommended at exam"
+    }
+  },
+  "plan_covers": {
+    "7": [
+      "vaccination",
+      "parasite"
+    ],
+    "8": [
+      "vaccination",
+      "parasite"
+    ],
+    "9": [
+      "vaccination",
+      "parasite",
+      "senior"
+    ]
+  },
+  "plan_life_stage": {
+    "7": "young",
+    "8": "adult",
+    "9": "senior"
+  }
+}

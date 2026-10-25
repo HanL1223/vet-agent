@@ -1,0 +1,59 @@
+{
+  "meta": {
+    "timestamp": 1793066400,
+    "items_page_size": 6,
+    "items_page": 1,
+    "items_page_total": 1,
+    "items_total": 6
+  },
+  "items": [
+    {
+      "product": {
+        "id": "301",
+        "active": true,
+        "name": "Annual vaccination and health check",
+        "price": "120.00"
+      }
+    },
+    {
+      "product": {
+        "id": "302",
+        "active": true,
+        "name": "Flea and tick chew, 3-month",
+        "price": "96.00"
+      }
+    },
+    {
+      "product": {
+        "id": "303",
+        "active": true,
+        "name": "Heartworm injection, 12-month",
+        "price": "160.00"
+      }
+    },
+    {
+      "product": {
+        "id": "304",
+        "active": true,
+        "name": "Senior blood and urine screening",
+        "price": "280.00"
+      }
+    },
+    {
+      "product": {
+        "id": "305",
+        "active": true,
+        "name": "Dental scale and polish (GA)",
+        "price": "650.00"
+      }
+    },
+    {
+      "product": {
+        "id": "306",
+        "active": true,
+        "name": "Worming tablet, 3-month",
+        "price": "96.00"
+      }
+    }
+  ]
+}

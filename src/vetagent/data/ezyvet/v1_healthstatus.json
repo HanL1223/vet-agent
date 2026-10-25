@@ -1,0 +1,35 @@
+{
+  "meta": {
+    "timestamp": 1793066400,
+    "items_page_size": 3,
+    "items_page": 1,
+    "items_page_total": 1,
+    "items_total": 3
+  },
+  "items": [
+    {
+      "healthstatus": {
+        "id": "9101",
+        "animal_id": "1201",
+        "weight": "32.0",
+        "created_at": 1781056800
+      }
+    },
+    {
+      "healthstatus": {
+        "id": "9102",
+        "animal_id": "1201",
+        "weight": "31.8",
+        "created_at": 1786672800
+      }
+    },
+    {
+      "healthstatus": {
+        "id": "9103",
+        "animal_id": "1201",
+        "weight": "31.4",
+        "created_at": 1790992800
+      }
+    }
+  ]
+}

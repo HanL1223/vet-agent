@@ -3,65 +3,87 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Care assistant · Vet care agent</title>
+  <title>Biscuit · Northside Family Vets</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=IBM+Plex+Mono:wght@500&family=Nunito+Sans:opsz,wght@6..12,400;6..12,600;6..12,700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/static/app.css">
   <link rel="stylesheet" href="/static/owner.css">
 </head>
 <body>
-<div class="phone">
-  <header class="top">
-    <div class="small" id="clinic" style="font-weight: 600; opacity: .9"></div>
-    <div class="who">
-      <div class="avatar" id="avatar" aria-hidden="true"></div>
-      <div style="flex: 1; min-width: 0">
-        <div id="title" style="font-weight: 700; font-size: 17px"></div>
-        <div class="small" style="opacity: .92">Uses clinic records · not a vet</div>
+<header class="bar">
+  <span class="brand"><span class="mark" data-mark></span><span id="clinic" class="serif"></span></span>
+  <nav class="views" role="tablist" aria-label="Views">
+    <button role="tab" data-view="board" aria-selected="true">Dashboard</button>
+    <button role="tab" data-view="ask" aria-selected="false">Ask</button>
+  </nav>
+  <button class="icon" id="open-data" aria-label="Your data choices">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l7 3v6c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6l7-3z"/><path d="M9 12l2 2 4-4"/></svg>
+  </button>
+</header>
+
+<div class="layout" data-show="board">
+  <main class="board" id="board" aria-live="polite">
+    <section class="hero">
+      <div class="pet-face big" id="avatar"></div>
+      <div>
+        <h1 id="pet-name"></h1>
+        <p class="muted" id="pet-meta"></p>
       </div>
-      <button class="icon" id="open-data" aria-label="Your data choices">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l7 3v6c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6l7-3z"/><path d="M9 12l2 2 4-4"/></svg>
-      </button>
+    </section>
+    <div class="tiles">
+      <section class="card tile" aria-labelledby="t-due"><h2 class="label" id="t-due">Needs attention</h2><div id="due"></div></section>
+      <section class="card tile" aria-labelledby="t-check"><h2 class="label" id="t-check">Weekly check-in</h2><div id="checkin"></div></section>
+      <section class="card tile" aria-labelledby="t-cover"><h2 class="label" id="t-cover">Parasite cover, last 12 months</h2><div id="cover"></div></section>
+      <section class="card tile" aria-labelledby="t-cost"><h2 class="label" id="t-cost">Next 12 months of care</h2><div id="cost"></div></section>
+      <section class="card tile" aria-labelledby="t-weight"><h2 class="label" id="t-weight">Weight</h2><div id="weight"></div></section>
     </div>
-  </header>
+    <p id="board-error" class="error" role="alert"></p>
+  </main>
 
-  <div class="chat" id="chat-scroll">
-    <div id="chat" class="thread" aria-live="polite"></div>
-  </div>
-
-  <footer class="composer">
-    <div class="chips" role="group" aria-label="Suggested messages" id="chips"></div>
-    <form id="form" class="send-row">
-      <label for="input" class="sr-only">Message the care assistant</label>
-      <input id="input" autocomplete="off" placeholder="Ask about your pet..." maxlength="1000">
-      <button class="send" aria-label="Send">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="M13 6l6 6-6 6"/></svg>
-      </button>
-    </form>
-    <p id="error" class="error" role="alert"></p>
-    <p class="muted small mode"><span id="mode"></span> · <button class="link" id="reset">Start over</button> · <a href="/clinic">Clinic view</a></p>
-  </footer>
-
-  <div class="sheet-backdrop" id="sheet" hidden>
-    <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="sheet-title">
-      <div style="display: flex; justify-content: space-between; align-items: center">
-        <h2 id="sheet-title" style="font-size: 18px">Your data choices</h2>
-        <button class="btn ghost" id="close-data">Done</button>
-      </div>
-      <div class="switch-row">
-        <div><b class="small">Share my home log with the clinic</b>
-          <div class="muted small">Your vet sees weights and notes before visits.</div></div>
-        <button class="switch" role="switch" id="share-log" aria-checked="true" aria-label="Share my home log with the clinic"><span></span></button>
-      </div>
-      <div class="switch-row">
-        <div><b class="small">Help improve pet care</b>
-          <div class="muted small">De-identified use only. Your name and contact details are never included. Change anytime.</div></div>
-        <button class="switch" role="switch" id="deidentified" aria-checked="false" aria-label="Help improve pet care with de-identified data"><span></span></button>
-      </div>
+  <aside class="ask" aria-label="Care assistant">
+    <div class="ask-head">
+      <h2 class="label">Ask</h2>
+      <span class="muted small">Care assistant · uses clinic records · not a vet</span>
     </div>
+    <div class="chat" id="chat-scroll">
+      <div id="chat" class="thread" aria-live="polite"></div>
+    </div>
+    <footer class="composer">
+      <div class="chips" role="group" aria-label="Suggested messages" id="chips"></div>
+      <form id="form" class="send-row">
+        <label for="input" class="sr-only">Message the care assistant</label>
+        <input id="input" autocomplete="off" placeholder="Ask about your pet..." maxlength="1000">
+        <button class="send" aria-label="Send">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="M13 6l6 6-6 6"/></svg>
+        </button>
+      </form>
+      <p id="error" class="error" role="alert"></p>
+      <p class="muted small mode"><button class="link" id="reset">Start over</button> · <a href="/clinic">Clinic view</a></p>
+    </footer>
+  </aside>
+</div>
+
+<div class="sheet-backdrop" id="sheet" hidden>
+  <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="sheet-title">
+    <div style="display: flex; justify-content: space-between; align-items: center">
+      <h2 id="sheet-title" style="font-size: 20px">Your data choices</h2>
+      <button class="btn ghost" id="close-data">Done</button>
+    </div>
+    <div class="switch-row">
+      <div><b class="small">Share my home log with the clinic</b>
+        <div class="muted small">Your vet sees weights, check-ins and notes before visits.</div></div>
+      <button class="switch" role="switch" id="share-log" aria-checked="true" aria-label="Share my home log with the clinic"><span></span></button>
+    </div>
+    <div class="switch-row">
+      <div><b class="small">Help improve pet care</b>
+        <div class="muted small">De-identified use only. Your name and contact details are never included. Change anytime.</div></div>
+      <button class="switch" role="switch" id="deidentified" aria-checked="false" aria-label="Help improve pet care with de-identified data"><span></span></button>
+    </div>
+    <p class="muted small about">The assistant uses your clinic's records. It isn't a vet and can't diagnose. Replies come from: <span id="mode"></span>.</p>
   </div>
 </div>
 <script src="/static/common.js"></script>
 <script src="/static/owner.js"></script>
+<script src="/static/dashboard.js"></script>
 </body>
 </html>

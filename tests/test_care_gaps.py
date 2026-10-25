@@ -56,7 +56,7 @@ def test_cg4_dental_cleared_by_later_procedure():
     assert gaps_for(pet(), events) == []
 
 
-def test_seed_clinic_has_eight_gaps_ranked_by_value(practice):
+def test_demo_clinic_has_eight_gaps_ranked_by_value(practice):
     gaps = rank_by_value(
         g
         for p in practice.pets()

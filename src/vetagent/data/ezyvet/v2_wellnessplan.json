@@ -1,0 +1,38 @@
+{
+  "meta": {
+    "timestamp": 1793066400,
+    "items_page_size": 3,
+    "items_page": 1,
+    "items_page_total": 1,
+    "items_total": 3
+  },
+  "items": [
+    {
+      "wellnessplan": {
+        "id": "7",
+        "active": true,
+        "name": "Puppy and Kitten",
+        "price": "49.00",
+        "payment_frequency": "Monthly"
+      }
+    },
+    {
+      "wellnessplan": {
+        "id": "8",
+        "active": true,
+        "name": "Adult",
+        "price": "52.00",
+        "payment_frequency": "Monthly"
+      }
+    },
+    {
+      "wellnessplan": {
+        "id": "9",
+        "active": true,
+        "name": "Senior",
+        "price": "59.00",
+        "payment_frequency": "Monthly"
+      }
+    }
+  ]
+}

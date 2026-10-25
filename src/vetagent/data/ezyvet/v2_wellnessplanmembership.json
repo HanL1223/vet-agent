@@ -1,0 +1,47 @@
+{
+  "meta": {
+    "timestamp": 1793066400,
+    "items_page_size": 4,
+    "items_page": 1,
+    "items_page_total": 1,
+    "items_total": 4
+  },
+  "items": [
+    {
+      "wellnessplanmembership": {
+        "id": "41",
+        "animal_id": "1201",
+        "wellness_plan_id": "9",
+        "status": "Active",
+        "start_date": 1767229200
+      }
+    },
+    {
+      "wellnessplanmembership": {
+        "id": "42",
+        "animal_id": "1204",
+        "wellness_plan_id": "8",
+        "status": "Active",
+        "start_date": 1772326800
+      }
+    },
+    {
+      "wellnessplanmembership": {
+        "id": "43",
+        "animal_id": "1206",
+        "wellness_plan_id": "8",
+        "status": "Active",
+        "start_date": 1777600800
+      }
+    },
+    {
+      "wellnessplanmembership": {
+        "id": "44",
+        "animal_id": "1205",
+        "wellness_plan_id": "7",
+        "status": "Cancelled",
+        "start_date": 1709254800
+      }
+    }
+  ]
+}

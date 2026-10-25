@@ -7,9 +7,10 @@ Guidance for Claude (and humans) working in this repo.
 A demo of a vet care-plan platform with two faces:
 
 - **Clinic dashboard** (`/clinic`): care-gap radar, reminders, plans, requests from owners.
-- **Owner care agent** (`/owner`): a chat agent for one pet owner, branded as the clinic.
+- **Owner pet dashboard** (`/owner`): tiles for one owner's pet (check-ins, parasite cover, cost
+  forecast, weight) with the care agent beside them as "Ask". Branded as the clinic.
 
-Requirements live in `docs/requirements.md` with IDs (CL-*, CG-*, AG-*, PR-*).
+Requirements live in `docs/requirements.md` with IDs (CL-*, CG-*, AG-*, HT-*, BR-*, PR-*).
 Code docstrings and test names reference these IDs. Start there before changing behaviour.
 
 ## Commands
@@ -30,8 +31,9 @@ uv add <package> / uv add --dev <pkg>    # dependencies (updates uv.lock; commit
 
 Use `pathlib` for paths and avoid `%-d`-style strftime codes (not supported on Windows).
 
-No API key needed: with `ANTHROPIC_API_KEY` empty the agent uses `ScriptedModel` (offline).
-Set the key in `.env` to use Claude through the same loop and tools.
+No API key needed: with the provider's key empty the agent uses `ScriptedModel` (offline).
+`VETAGENT_PROVIDER` picks `anthropic` (default, `ANTHROPIC_API_KEY`) or `openai` (`OPENAI_API_KEY`);
+set the key in `.env` to use that model through the same loop and tools.
 
 ## Architecture (dependencies point inwards)
 
@@ -39,15 +41,20 @@ Set the key in `.env` to use Claude through the same loop and tools.
 web/ (static HTML/JS) -> api/ (FastAPI routes) -> services/ (use cases)
                                                    |-> agent/ (loop, tools, safety, model adapters)
                                                    |-> domain/ (pure rules: care gaps, plan value)
-                                                   |-> integrations/ (PracticeSystem port + seed adapter)
+                                                   |-> integrations/ (PracticeSystem port + ezyVet adapter)
                                                    |-> store/ (SQLite for app-owned data)
 ```
 
 - `domain/` is pure: no I/O, no framework imports. Put business rules here and unit-test them.
-- `integrations/practice.py` defines the `PracticeSystem` protocol. `SeedPracticeSystem` reads
-  `data/seed_clinic.json`. A real ezyVet adapter must implement the same protocol; nothing else changes.
+- `integrations/practice.py` defines the `PracticeSystem` protocol. `EzyVetPracticeSystem`
+  (`integrations/ezyvet.py`) implements it by mapping ezyVet API records to domain models. The demo
+  reads saved ezyVet list responses from `data/ezyvet/` (fictional clinic) through `FileSource`.
+  `data/ezyvet/clinic_config.json` holds per-clinic settings ezyVet doesn't know.
 - `store/sqlite.py` holds only data the app owns (chat, proposals, requests, weights, consent,
-  reminders). Never copy clinic records into it (PR-3).
+  reminders, check-ins, owner-given doses). Never copy clinic records into it (PR-3).
+- `services/home.py` builds the owner dashboard from pure rules in `domain/` (`checkins.py`,
+  `cover.py`, `forecast.py`). It never contacts the clinic; "Ask for a check-up" goes through
+  `OwnerAgentService.propose_checkup`, so AG-4 still holds. `data/demo_home.json` seeds check-ins.
 - `api/wiring.py` is the only place dependencies are chosen. Swap adapters there.
 - `web/` holds no business or agent logic; it renders what the API returns.
 
@@ -60,7 +67,7 @@ web/ (static HTML/JS) -> api/ (FastAPI routes) -> services/ (use cases)
   `card` goes to the UI. `trace` text feeds "What I did" (AG-7).
 - Tools that contact the clinic only create a **proposal**. Only `OwnerAgentService.confirm`
   sends anything to the clinic (AG-4). Keep it that way.
-- `agent/llm.py`: `Model` protocol, `ClaudeModel`, `ScriptedModel`. Messages are stored in a
+- `agent/llm.py`: `Model` protocol, `ClaudeModel`, `OpenAIModel`, `ScriptedModel`. Messages are stored in a
   provider-neutral format (see `agent/__init__.py`); adapters translate.
 - `agent/prompts.py`: system prompt. The agent is not a vet: no diagnosis, no medicines or doses.
 
@@ -71,9 +78,11 @@ web/ (static HTML/JS) -> api/ (FastAPI routes) -> services/ (use cases)
 - **New agent tool**: write the handler in `agent/tools.py`, register it in `TOOLS`, add a card
   renderer in `web/owner.js` if it returns a card, teach `ScriptedModel` an intent if the offline
   demo should use it, and add a test.
-- **New card type**: one function in the `CARDS` map in `web/owner.js`.
-- **Real ezyVet**: new class in `integrations/` implementing `PracticeSystem`, chosen in
-  `api/wiring.py`. Respect 60 calls/min per endpoint and 180/min per database; cache reads.
+- **New card type**: one function in the `CARDS` map in `web/owner.js`. Follow `docs/design.md`.
+- **New dashboard tile**: a pure rule in `domain/`, a section in `HomeService.dashboard`, one
+  function in the `TILES` map in `web/dashboard.js`, a requirement ID and a test.
+- **Real ezyVet**: a live `EzyVetSource` (OAuth, paging) in `integrations/ezyvet.py`, passed to
+  `EzyVetPracticeSystem` in `api/wiring.py`. Demo data changes go in `data/ezyvet/` in the same shape. Respect 60 calls/min per endpoint and 180/min per database; cache reads.
 
 ## Conventions
 
@@ -86,7 +95,7 @@ web/ (static HTML/JS) -> api/ (FastAPI routes) -> services/ (use cases)
 
 ## Not built yet (next steps)
 
-- Real ezyVet adapter and partner approval (IDEXX), CSV import for pilots.
+- Real ezyVet adapter and partner approval (IDEXX), CSV import for pilots. See `docs/ezyvet.md`.
 - Auth and multi-tenant clinics/owners (demo uses one owner `o1` with pet `p1`).
 - Reminder delivery (SMS/email), payments (Stripe direct debit), plan builder.
 - Evals for the Claude path: urgent-symptom recall, no-diagnosis checks, proposal-not-claimed checks.

@@ -1,0 +1,95 @@
+{
+  "meta": {
+    "timestamp": 1793066400,
+    "items_page_size": 12,
+    "items_page": 1,
+    "items_page_total": 1,
+    "items_total": 12
+  },
+  "items": [
+    {
+      "wellnessplanbenefit": {
+        "id": "151",
+        "wellness_plan_id": "7",
+        "name": "All first-year vaccinations"
+      }
+    },
+    {
+      "wellnessplanbenefit": {
+        "id": "152",
+        "wellness_plan_id": "7",
+        "name": "Unlimited standard consults"
+      }
+    },
+    {
+      "wellnessplanbenefit": {
+        "id": "153",
+        "wellness_plan_id": "7",
+        "name": "Microchip and desexing discount"
+      }
+    },
+    {
+      "wellnessplanbenefit": {
+        "id": "154",
+        "wellness_plan_id": "7",
+        "name": "Monthly parasite treatment, delivered"
+      }
+    },
+    {
+      "wellnessplanbenefit": {
+        "id": "155",
+        "wellness_plan_id": "8",
+        "name": "Annual vaccination and health check"
+      }
+    },
+    {
+      "wellnessplanbenefit": {
+        "id": "156",
+        "wellness_plan_id": "8",
+        "name": "Unlimited standard consults"
+      }
+    },
+    {
+      "wellnessplanbenefit": {
+        "id": "157",
+        "wellness_plan_id": "8",
+        "name": "Heartworm injection"
+      }
+    },
+    {
+      "wellnessplanbenefit": {
+        "id": "158",
+        "wellness_plan_id": "8",
+        "name": "Monthly parasite treatment, delivered"
+      }
+    },
+    {
+      "wellnessplanbenefit": {
+        "id": "159",
+        "wellness_plan_id": "9",
+        "name": "Annual vaccination and two health checks"
+      }
+    },
+    {
+      "wellnessplanbenefit": {
+        "id": "160",
+        "wellness_plan_id": "9",
+        "name": "Senior blood and urine screening"
+      }
+    },
+    {
+      "wellnessplanbenefit": {
+        "id": "161",
+        "wellness_plan_id": "9",
+        "name": "$150 off a dental procedure"
+      }
+    },
+    {
+      "wellnessplanbenefit": {
+        "id": "162",
+        "wellness_plan_id": "9",
+        "name": "Monthly parasite treatment, delivered"
+      }
+    }
+  ]
+}

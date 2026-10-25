@@ -1,6 +1,7 @@
 """Model adapters (AG-8). The loop depends only on the `Model` protocol.
 
 - `ClaudeModel` calls the Anthropic Messages API.
+- `OpenAIModel` calls the OpenAI Chat Completions API.
 - `ScriptedModel` is an offline, rule-based stand-in so the demo runs without an API key.
   It uses the same tools and the same loop, so the walkthrough exercises the real flow.
 """
@@ -93,6 +94,75 @@ def to_anthropic(messages: list[dict]) -> list[dict]:
             out.append({"role": role, "content": blocks})
     if out and out[0]["role"] != "user":
         out.insert(0, {"role": "user", "content": [{"type": "text", "text": "(opened the app)"}]})
+    return out
+
+
+# --- OpenAI ----------------------------------------------------------------------
+
+
+class OpenAIModel:
+    def __init__(self, api_key: str, model: str, max_tokens: int = 600) -> None:
+        import openai
+
+        self._client = openai.OpenAI(api_key=api_key)
+        self._model = model
+        self._max_tokens = max_tokens
+        self.name = f"openai ({model})"
+
+    def reply(self, system: str, messages: list[dict], tools: list[Tool]) -> ModelReply:
+        response = self._client.chat.completions.create(
+            model=self._model,
+            max_completion_tokens=self._max_tokens,
+            tools=[
+                {
+                    "type": "function",
+                    "function": {
+                        "name": t.name,
+                        "description": t.description,
+                        "parameters": t.input_schema,
+                    },
+                }
+                for t in tools
+            ],
+            messages=[{"role": "system", "content": system}, *to_openai(messages)],
+        )
+        message = response.choices[0].message
+        calls = [
+            ToolCall(c.id, c.function.name, json.loads(c.function.arguments or "{}"))
+            for c in message.tool_calls or []
+        ]
+        return ModelReply((message.content or "").strip(), calls)
+
+
+def to_openai(messages: list[dict]) -> list[dict]:
+    """Neutral messages -> OpenAI chat format. Tool args and results travel as JSON strings."""
+    out: list[dict] = []
+    for m in messages:
+        if m["role"] == "user":
+            out.append({"role": "user", "content": m["text"]})
+        elif m["role"] == "assistant":
+            calls = [
+                {
+                    "id": c["id"],
+                    "type": "function",
+                    "function": {"name": c["name"], "arguments": json.dumps(c["args"])},
+                }
+                for c in m.get("tool_calls", [])
+            ]
+            if not m.get("text") and not calls:
+                continue  # card-only turns carry nothing for the model
+            msg: dict = {"role": "assistant", "content": m.get("text") or None}
+            if calls:
+                msg["tool_calls"] = calls
+            out.append(msg)
+        else:
+            out.append(
+                {
+                    "role": "tool",
+                    "tool_call_id": m["tool_call_id"],
+                    "content": json.dumps(m["result"]),
+                }
+            )
     return out
 
 

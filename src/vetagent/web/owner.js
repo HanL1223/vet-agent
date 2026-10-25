@@ -1,4 +1,5 @@
-// Owner care agent: renders the conversation the API returns. No agent logic lives here.
+// Owner app, Ask panel: renders the conversation the API returns. No agent logic lives here.
+// dashboard.js renders the tiles; both share `api`, `send` and `showView`.
 
 const CHIPS = [
   "What's due?",
@@ -13,65 +14,81 @@ let busy = false;
 
 // --- Cards: one renderer per card type the tools return ------------------------
 const CARDS = {
-  care_due: (c) => c.items.map((i) => `
-    <div class="c ${i.status === "overdue" ? "warn" : ""}">
-      <div class="label ${i.status === "overdue" ? "warn" : ""}">${i.status === "overdue" ? "OVERDUE" : "DUE SOON"}</div>
-      <div style="font-weight: 700; margin-top: 4px">${esc(i.title)}</div>
-      <div class="small" style="margin-top: 4px">${esc(i.due_label)} · ${money(i.value)}</div>
-      <div class="muted small" style="margin-top: 4px">${esc(i.reason)}</div>
-    </div>`).join(""),
+  care_due: (c) => c.items.map((i) => {
+    const overdue = i.status === "overdue";
+    return `
+    <div class="c ${overdue ? "overdue" : ""}">
+      <span class="status small ${overdue ? "overdue" : "soon"}">${esc(i.due_label)}</span>
+      <div class="title">${esc(i.title)}</div>
+      <div class="muted small" style="margin-top: 2px">${esc(i.reason)}</div>
+      <div class="small" style="margin-top: 8px">Usually ${money(i.value)}</div>
+    </div>`;
+  }).join(""),
 
   plan_value: (c) => `
     <div class="c">
-      <div class="row"><span class="muted">Benefits used</span><b>${money(c.benefits_used)}</b></div>
+      <div class="label">${esc(c.plan)} plan</div>
+      <div class="row" style="margin-top: 6px"><span class="muted">Benefits used</span><b>${money(c.benefits_used)}</b></div>
       <div class="bar-track"><div class="bar-fill" style="width: ${Math.min(100, Math.round(100 * c.benefits_used / Math.max(c.paid, 1)))}%"></div></div>
-      <div class="row"><span class="muted">Plan payments so far</span><b>${money(c.paid)}</b></div>
-      <div class="muted small">${esc(c.plan)} plan · ${money(c.monthly_price)} a month · ${c.months_paid} months</div>
+      <div class="row"><span class="muted">Paid so far</span><b>${money(c.paid)}</b></div>
+      <div class="muted small">${money(c.monthly_price)} a month · ${c.months_paid} months</div>
     </div>`,
 
   weight: (c) => {
     const kgs = c.points.map((p) => p.kg);
     const lo = Math.min(...kgs) - 0.5, hi = Math.max(...kgs) + 0.5;
-    const bars = c.points.map((p, i) =>
-      `<div class="${i === c.points.length - 1 ? "now" : ""}" style="height: ${8 + Math.round(52 * (p.kg - lo) / (hi - lo))}px"></div>`).join("");
+    const step = c.points.length > 1 ? 260 / (c.points.length - 1) : 0;
+    const pts = c.points.map((p, i) => [20 + i * step, 8 + 44 * (hi - p.kg) / (hi - lo)]);
+    const dots = pts.map(([x, y], i) => {
+      const last = i === pts.length - 1;
+      return `<circle cx="${x}" cy="${y}" r="${last ? 5 : 3.5}" style="fill: ${last ? "var(--sage)" : "#fff"}; stroke: var(--sage); stroke-width: 2"/>
+        <text x="${x}" y="74" text-anchor="middle" style="font-size: 11px; fill: var(--muted)">${esc(c.points[i].label)}</text>`;
+    }).join("");
     return `
     <div class="c">
-      <b>Logged ${c.kg} kg</b>
+      <b>${c.kg} kg logged</b>
       <div class="muted small">${c.shared ? "Shared with the clinic" : "Kept in your log only"}</div>
-      <div class="bars" role="img" aria-label="Weight trend: ${c.points.map((p) => `${p.label} ${p.kg} kg`).join(", ")}">${bars}</div>
-      <div class="bar-labels">${c.points.map((p) => `<span>${esc(p.label)}</span>`).join("")}</div>
+      <svg class="trend" viewBox="0 0 300 80" role="img" aria-label="Weight trend: ${esc(c.points.map((p) => `${p.label} ${p.kg} kg`).join(", "))}">
+        <polyline points="${pts.map((p) => p.join(",")).join(" ")}" fill="none" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" style="stroke: var(--sage)"/>
+        ${dots}
+      </svg>
     </div>`;
   },
 
   proposal: (c) => `
     <div class="c">
-      <div class="label">${esc(c.title.toUpperCase())}</div>
-      <p class="small" style="margin-top: 6px; line-height: 1.5">${esc(c.detail)}</p>
+      <div class="label">${esc(c.title)}</div>
+      <p class="small" style="margin-top: 6px; line-height: 1.55">${esc(c.detail)}</p>
       ${c.status === "pending" ? `
         <div class="actions">
           <button class="btn" data-confirm="${esc(c.proposal_id)}">${esc(c.action)}</button>
           <button class="btn ghost" data-dismiss="${esc(c.proposal_id)}">Not now</button>
-        </div>` : `<div class="muted small" style="margin-top: 8px">${c.status === "confirmed" ? "Sent" : "Not sent"}</div>`}
+        </div>` : `<div class="trace" style="margin-top: 10px">${c.status === "confirmed" ? "Sent to the clinic" : "Not sent"}</div>`}
     </div>`,
 
   urgent: (c) => `
-    <div class="c danger">
-      <b style="color: var(--danger)">Call ${esc(c.clinic)} now</b>
-      <div class="small" style="margin-top: 4px">This shouldn't wait for a chat reply. If the clinic is closed, go to your nearest emergency vet.</div>
+    <div class="c danger" role="alert">
+      <div class="urgent-head">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.7a2 2 0 0 1-.5 2.1L8 9.8a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.7.7a2 2 0 0 1 1.7 2z"/></svg>
+        Call ${esc(c.clinic)} now
+      </div>
+      <div class="small" style="margin-top: 6px">This shouldn't wait for a chat reply. If the clinic is closed, go to your nearest emergency vet.</div>
     </div>`,
 
   done: (c) => `
-    <div class="c done"><b style="color: var(--brand-dark)">${esc(c.title)}</b>
+    <div class="c done"><b style="color: var(--sage-dark)">${esc(c.title)}</b>
       <div class="small">${esc(c.detail)}</div></div>`,
 };
 
 function renderItem(item) {
   if (item.role === "user") return `<div class="msg-user">${esc(item.text)}</div>`;
-  const texts = item.texts.map((t) => `<div class="bubble">${esc(t)}</div>`).join("");
+  const texts = item.texts.map((t) => `<p>${esc(t)}</p>`).join("");
   const cards = item.cards.map((c) => (CARDS[c.type] ? CARDS[c.type](c) : "")).join("");
-  const trace = item.trace.length ? `<div class="trace">What I did: ${esc(item.trace.join(", "))}</div>` : "";
-  return `<div class="msg-agent"><div class="dot" aria-hidden="true">${esc(convo.pet.name[0])}</div>
-    <div class="stack">${texts}${cards}${trace}</div></div>`;
+  const did = item.trace.join(" · ");
+  const trace = did
+    ? `<div class="trace"><span><span class="sr-only">What I did: </span>${esc(did[0].toUpperCase() + did.slice(1))}</span></div>`
+    : "";
+  return `<div class="msg-agent">${texts}${cards}${trace}</div>`;
 }
 
 function render() {
@@ -79,12 +96,11 @@ function render() {
     document.getElementById("chat").innerHTML = '<div class="typing">Loading...</div>';
     return;
   }
+  const pet = convo.pet;
   document.getElementById("clinic").textContent = convo.clinic;
-  document.getElementById("title").textContent = `${convo.pet.name}'s care assistant`;
-  document.getElementById("avatar").textContent = convo.pet.name[0];
-  document.getElementById("mode").textContent = `Model: ${convo.model}`;
-  document.getElementById("chat").innerHTML =
-    convo.items.map(renderItem).join("") + (busy ? '<div class="typing">Thinking...</div>' : "");
+  document.getElementById("mode").textContent = convo.model;
+  document.getElementById("chat").innerHTML = convo.items.map(renderItem).join("") +
+    (busy ? `<div class="typing">Checking ${esc(pet.name)}'s records...</div>` : "");
   document.getElementById("share-log").setAttribute("aria-checked", String(convo.consent.share_log));
   document.getElementById("deidentified").setAttribute("aria-checked", String(convo.consent.deidentified_use));
   const scroller = document.getElementById("chat-scroll");
@@ -103,6 +119,8 @@ async function run(request) {
   } finally {
     busy = false;
     render();
+    // Chat actions (a logged weight, a consent change) can change the tiles.
+    document.dispatchEvent(new Event("conversation-changed"));
   }
 }
 
@@ -112,6 +130,16 @@ function setError(text) {
 
 function send(text) {
   run(() => api("/api/owner/messages", { method: "POST", body: { text } }));
+}
+
+// Phones show one view at a time; on wide screens both are always visible.
+function showView(name) {
+  document.querySelector(".layout").dataset.show = name;
+  for (const tab of document.querySelectorAll("[data-view]")) {
+    tab.setAttribute("aria-selected", String(tab.dataset.view === name));
+  }
+  const scroller = document.getElementById("chat-scroll");
+  scroller.scrollTop = scroller.scrollHeight; // a hidden panel can't scroll, so catch up now
 }
 
 function setConsent(change) {
@@ -136,6 +164,7 @@ document.getElementById("input").addEventListener("input", () => setError(""));
 document.addEventListener("click", (event) => {
   const el = event.target.closest("button");
   if (!el) return;
+  if (el.dataset.view) showView(el.dataset.view);
   if (el.dataset.chip) send(el.dataset.chip);
   if (el.dataset.confirm) run(() => api(`/api/owner/proposals/${el.dataset.confirm}/confirm`, { method: "POST" }));
   if (el.dataset.dismiss) run(() => api(`/api/owner/proposals/${el.dataset.dismiss}/dismiss`, { method: "POST" }));

@@ -4,10 +4,17 @@ Demo of a vet care-plan platform for independent clinics on ezyVet:
 
 - **Clinic dashboard**: a care-gap radar that ranks overdue care by value, one-click reminders,
   care plans, and requests that owners sent from the agent.
-- **Owner care agent**: a chat assistant branded as the clinic. It raises what's due, checks
-  plan value honestly, logs weights with consent, drafts notes for the vet, and prepares bookings.
-  Anything that contacts the clinic waits for the owner to confirm. Urgent symptoms skip the
-  model and tell the owner to call the clinic now.
+- **Owner pet dashboard**: a page per pet, branded as the clinic. Tiles show what needs attention,
+  a 30-second weekly check-in with its 8-week trend, parasite cover over the last 12 months, the
+  next 12 months of care priced with and without the plan, and weight. A dropping check-in trend
+  offers "Ask for a check-up", and the clinic sees it when the owner shares their log.
+- **Care assistant** (beside the dashboard): raises what's due, checks plan value honestly, logs
+  weights with consent, drafts notes for the vet, and prepares bookings. Anything that contacts
+  the clinic waits for the owner to confirm. Urgent symptoms skip the model and tell the owner to
+  call the clinic now.
+
+`docs/business-model.md` explains the business: who pays, the pain points, and the data it
+builds.
 
 Runs offline with no API key (a scripted model drives the same agent loop and tools).
 Add an Anthropic API key to use Claude.
@@ -28,7 +35,7 @@ uv run vetagent         # http://localhost:8000
 ```
 
 The first run creates `.env` from `.env.example`. To use Claude, set `ANTHROPIC_API_KEY` in
-`.env` and restart.
+`.env` and restart. To use OpenAI instead, set `VETAGENT_PROVIDER=openai` and `OPENAI_API_KEY`.
 
 | Task | Command |
 | --- | --- |
@@ -40,32 +47,42 @@ The first run creates `.env` from `.env.example`. To use Claude, set `ANTHROPIC_
 
 ## Five-minute walkthrough
 
-1. **Clinic dashboard** (`/clinic`): 8 care gaps worth $1,802, ranked by value. Filter to
-   *Senior*, send Biscuit's reminder, and watch the KPI update.
-2. **Owner agent** (`/owner`): it greets Priya and raises Biscuit's overdue senior screening.
-3. Tap *Is my plan worth it?*: $590 paid vs $412 used, and the screening would put her ahead.
-4. Tap *Book his screening*, then **Send to clinic**. Nothing is sent before that tap.
-5. Tap *He's limping again*: the agent won't diagnose, it drafts a note for Dr Lee.
-6. Tap *He's holding his leg up*: urgent path, "call the clinic now", no model involved.
-7. Tap *Log weight 31.2 kg*. Open **Data** (shield icon), turn sharing off, log again.
+1. **Clinic dashboard** (`/clinic`): 8 care gaps worth $1,802, ranked by value. Biscuit carries
+   a "Home check-ins: mobility down" tag from Priya's weekly check-ins.
+2. **Owner dashboard** (`/owner`): the mark at the top left is one of Priya's pets (Biscuit or
+   Mango, her cockatiel), picked at random on each visit. Biscuit's check-in tile says mobility has
+   been lower for two weeks. Tap **Ask for a check-up**, then **Send to clinic**. Nothing is sent before that tap.
+3. **Next 12 months of care**: $944 pay-as-you-go against $708 on his Senior plan.
+4. **Parasite cover**: 85% of the last year for flea and tick, with two gaps. Tap **Given today**.
+5. Do this week's check-in (**Update this week** if you've already done one).
+6. In **Ask**: *He's limping again* drafts a note for Dr Lee (no diagnosis); *He's holding his
+   leg up* takes the urgent path with no model involved; *Log weight 31.2 kg* updates the tile.
+7. Open **Data** (shield icon) and turn sharing off: the clinic's tag disappears.
 8. Back in the clinic dashboard, open **Requests** to see what Priya sent.
 
-*Start over* (under the chat) resets the conversation; `uv run vetagent --reset` wipes all demo state.
+*Start over* (under the chat) resets the conversation; `uv run vetagent --reset` wipes all demo
+state, including check-ins.
 
 ## Project layout
 
 ```
 src/vetagent/
-  domain/        pure rules: care gaps, plan value
-  integrations/  PracticeSystem port + seed (ezyVet-shaped) adapter
+  domain/        pure rules: care gaps, plan value, check-in trend, cover, cost forecast
+  integrations/  PracticeSystem port + ezyVet adapter (mapping: docs/ezyvet.md)
   store/         SQLite for app-owned data
   agent/         loop, tools, safety gate, prompts, model adapters
-  services/      clinic dashboard + owner agent use cases
+  services/      clinic dashboard, owner dashboard (home.py) and owner agent use cases
   api/           FastAPI routes and wiring
   web/           static pages (no framework, no build step)
-  data/          seed clinic data
+  data/ezyvet/   demo clinic as saved ezyVet API responses (fictional)
+  data/demo_home.json   demo app-owned history (8 weeks of check-ins)
 docs/requirements.md   requirement IDs referenced by code and tests
 tests/                 pytest
 ```
 
 See `CLAUDE.md` for architecture rules and how to extend it.
+
+## Credits
+
+Pet silhouettes from [game-icons.net](https://game-icons.net), CC BY 3.0: sitting dog, rabbit
+and kiwi by Delapouite, cat by Lorc.

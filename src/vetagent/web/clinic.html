@@ -3,92 +3,113 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Clinic dashboard · Vet care agent</title>
+  <title>Clinic · Northside Family Vets</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=IBM+Plex+Mono:wght@500&family=Nunito+Sans:opsz,wght@6..12,400;6..12,600;6..12,700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/static/app.css">
   <style>
-    header { background: var(--surface); border-bottom: 1px solid var(--line); }
-    .bar { max-width: 1240px; margin: 0 auto; padding: 14px 24px; display: flex; flex-wrap: wrap; gap: 16px; align-items: center; justify-content: space-between; }
-    .logo { width: 40px; height: 40px; border-radius: 10px; background: var(--brand); display: grid; place-items: center; color: #fff; font-weight: 700; }
-    nav { display: flex; gap: 6px; background: #eef3f1; padding: 4px; border-radius: 10px; }
-    nav button { min-height: 40px; padding: 0 16px; border: 0; border-radius: 8px; background: transparent; color: #4a5753; font-weight: 600; }
-    nav button[aria-selected="true"] { background: var(--surface); color: var(--ink); font-weight: 700; box-shadow: 0 1px 2px rgba(19,32,28,.12); }
-    main { max-width: 1240px; margin: 0 auto; padding: 24px; display: grid; gap: 24px; }
-    .kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 16px; }
-    .kpi { padding: 18px; }
-    .kpi b { display: block; font-size: 30px; margin-top: 6px; }
-    .panel-head { padding: 20px; display: flex; flex-wrap: wrap; gap: 16px; align-items: flex-end; justify-content: space-between; border-bottom: 1px solid var(--line-soft); }
-    .filters { display: flex; flex-wrap: wrap; gap: 8px; }
-    .row { display: flex; flex-wrap: wrap; gap: 16px; align-items: center; padding: 16px 20px; border-bottom: 1px solid var(--line-soft); }
-    .row .who { flex: 1 1 220px; min-width: 0; }
-    .row .what { flex: 2 1 280px; min-width: 0; }
-    .row .when { flex: 0 0 140px; }
-    .row .act { flex: 0 0 170px; display: flex; justify-content: flex-end; }
-    .overdue { color: var(--warn); font-weight: 600; }
-    .soon { color: var(--brand-dark); font-weight: 600; }
-    .sent { color: var(--brand-dark); font-weight: 600; min-height: 44px; display: flex; align-items: center; }
-    .foot { padding: 16px 20px; display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between; background: #f8fbfa; }
+    header { border-bottom: 1px solid var(--rule); }
+    .bar { max-width: 1120px; margin: 0 auto; padding: 16px 24px 0; display: flex; flex-wrap: wrap; gap: 8px 24px; align-items: flex-end; justify-content: space-between; }
+    .brand { display: flex; gap: 12px; align-items: center; padding-bottom: 14px; }
+    .brand .mark { width: 34px; height: 34px; }
+    nav { display: flex; gap: 4px; }
+    nav button { min-height: 44px; padding: 0 14px; border: 0; border-bottom: 2px solid transparent; background: none; color: var(--muted); font-weight: 600; }
+    nav button:hover { color: var(--ink); }
+    nav button[aria-selected="true"] { color: var(--ink); border-bottom-color: var(--sage); font-weight: 700; }
+    .preview { padding-bottom: 14px; }
+    main { max-width: 1120px; margin: 0 auto; padding: 32px 24px 48px; display: grid; gap: 28px; }
+    .kpis { display: grid; grid-template-columns: repeat(4, 1fr); }
+    .kpi { padding: 18px 22px; }
+    .kpi + .kpi { border-left: 1px solid var(--rule); }
+    .kpi b { display: block; font-family: "Fraunces", Georgia, serif; font-weight: 500; font-size: 30px; margin: 2px 0; }
+    .section-head { display: flex; flex-wrap: wrap; gap: 16px; align-items: flex-end; justify-content: space-between; margin-bottom: 14px; }
+    .tools { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+    .filters { display: flex; flex-wrap: wrap; gap: 6px; }
+    .list { overflow: hidden; }
+    .row { display: grid; grid-template-columns: minmax(200px, 1.1fr) minmax(220px, 1.6fr) 160px 132px; gap: 16px; align-items: center; padding: 16px 22px; }
+    .row + .row { border-top: 1px solid var(--rule); }
+    .pet { display: flex; gap: 12px; align-items: center; min-width: 0; }
+    .when { text-align: right; }
+    .act { display: flex; justify-content: flex-end; }
+    .act .btn { min-width: 112px; }
+    .sent { color: var(--sage-dark); font-weight: 700; min-height: 44px; display: flex; align-items: center; gap: 6px; }
+    .note { padding: 0 4px; margin-top: 12px; }
     .plans { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; }
-    .plan { padding: 20px; display: grid; gap: 10px; }
-    .plan ul { margin: 0; padding-left: 18px; line-height: 1.7; font-size: 14px; }
-    .empty { padding: 24px 20px; }
+    .plan { padding: 22px; display: grid; gap: 10px; align-content: start; }
+    .plan .price { font-family: "Fraunces", Georgia, serif; font-size: 30px; }
+    .plan ul { margin: 4px 0 0; padding-left: 18px; line-height: 1.8; font-size: 14px; color: var(--ink-2); }
+    .req { grid-template-columns: minmax(180px, 1fr) minmax(240px, 2.4fr) 170px; }
+    .empty { padding: 28px 22px; }
+    @media (max-width: 860px) {
+      .kpis { grid-template-columns: 1fr 1fr; }
+      .kpi:nth-child(3) { border-left: 0; }
+      .kpi:nth-child(n+3) { border-top: 1px solid var(--rule); }
+      .row, .req { grid-template-columns: 1fr auto; }
+      .row .pet, .row .what { grid-column: 1 / -1; }
+      .row .what { grid-row: 2; }
+      .kpi b { font-size: 24px; }
+      .row .when { text-align: left; grid-row: 3; }
+      .row .act { grid-row: 3; }
+      .req .when { grid-row: 1; text-align: right; }
+    }
   </style>
 </head>
 <body>
 <header>
   <div class="bar">
-    <div style="display: flex; gap: 12px; align-items: center">
-      <div class="logo" aria-hidden="true">N</div>
+    <div class="brand">
+      <span class="mark" data-mark></span>
       <div>
-        <div id="clinic-name" style="font-weight: 700; font-size: 17px">Clinic</div>
-        <div class="muted small">Care-plan platform · clinic view</div>
+        <div id="clinic-name" class="serif" style="font-size: 18px">Clinic</div>
+        <div class="label">Clinic view</div>
       </div>
     </div>
     <nav role="tablist" aria-label="Views">
-      <button role="tab" data-tab="gaps" aria-selected="true">Care gaps</button>
-      <button role="tab" data-tab="plans" aria-selected="false">Plans</button>
+      <button role="tab" data-tab="gaps" aria-selected="true">Due for care</button>
+      <button role="tab" data-tab="plans" aria-selected="false">Care plans</button>
       <button role="tab" data-tab="requests" aria-selected="false">Requests</button>
     </nav>
-    <a href="/owner" class="small">Open owner agent</a>
+    <a href="/owner" class="small preview">Preview the owner app</a>
   </div>
 </header>
 
 <main>
   <div>
-    <h1 style="font-size: 26px">Today at the clinic</h1>
-    <p id="today" class="muted" style="margin-top: 6px"></p>
+    <h1 style="font-size: 32px">Today at the clinic</h1>
+    <p id="today" class="muted" style="margin-top: 4px"></p>
   </div>
-  <div class="kpis" id="kpis" aria-live="polite"></div>
+  <div class="card kpis" id="kpis" aria-live="polite"></div>
 
-  <section id="tab-gaps" class="card" aria-labelledby="gaps-title">
-    <div class="panel-head">
+  <section id="tab-gaps" aria-labelledby="gaps-title">
+    <div class="section-head">
       <div>
-        <h2 id="gaps-title" style="font-size: 19px">Care-gap radar</h2>
-        <p class="muted small" style="margin-top: 4px">Ranked by value. Built from vaccinations, parasite repeats, senior screening and exam findings.</p>
+        <h2 id="gaps-title" style="font-size: 22px">Pets due for care</h2>
+        <p class="muted small" style="margin-top: 2px">Most valuable first. From vaccinations, flea, tick and worming repeats, senior checks and exam findings.</p>
       </div>
-      <div class="filters" role="group" aria-label="Filter by care type" id="filters"></div>
+      <div class="tools">
+        <div class="filters" role="group" aria-label="Filter by care type" id="filters"></div>
+        <button class="btn" id="send-all">Remind all shown</button>
+      </div>
     </div>
-    <div id="gap-rows"></div>
-    <div class="foot">
-      <span class="muted small">Reminders go out in the clinic's name. The demo records the send.</span>
-      <button class="btn ghost" id="send-all">Send all shown</button>
-    </div>
+    <div class="card list" id="gap-rows"></div>
+    <p class="muted small note">Reminders go out in the clinic's name. In this demo the send is recorded, not delivered.</p>
   </section>
 
   <section id="tab-plans" hidden aria-labelledby="plans-title">
-    <h2 id="plans-title" style="font-size: 19px; margin-bottom: 12px">Care plans</h2>
+    <div class="section-head">
+      <h2 id="plans-title" style="font-size: 22px">Care plans</h2>
+    </div>
     <div class="plans" id="plans"></div>
   </section>
 
-  <section id="tab-requests" class="card" hidden aria-labelledby="req-title">
-    <div class="panel-head">
+  <section id="tab-requests" hidden aria-labelledby="req-title">
+    <div class="section-head">
       <div>
-        <h2 id="req-title" style="font-size: 19px">Requests from owners</h2>
-        <p class="muted small" style="margin-top: 4px">Bookings and notes owners confirmed in the care agent.</p>
+        <h2 id="req-title" style="font-size: 22px">Requests from owners</h2>
+        <p class="muted small" style="margin-top: 2px">Bookings and notes that owners confirmed in the app.</p>
       </div>
     </div>
-    <div id="requests"></div>
+    <div class="card list" id="requests"></div>
   </section>
 </main>
 <script src="/static/common.js"></script>
