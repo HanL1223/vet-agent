@@ -7,10 +7,13 @@ Guidance for Claude (and humans) working in this repo.
 A demo of a vet care-plan platform with two faces:
 
 - **Clinic dashboard** (`/clinic`): care-gap radar, reminders, plans, requests from owners.
-- **Owner pet dashboard** (`/owner`): tiles for one owner's pet (check-ins, parasite cover, cost
-  forecast, weight) with the care agent beside them as "Ask". Branded as the clinic.
+- **Owner app** (`/owner`): one page per pet the owner has. Sections: Costs (estimates and the year
+  ahead), Last visit, "Something not right?", First 90 days, Coming up and, for seniors, a weekly
+  check-in. The care agent sits beside them as "Ask". Branded as the clinic. See
+  `docs/owner-pain-points.md` for why these sections.
 
-Requirements live in `docs/requirements.md` with IDs (CL-*, CG-*, AG-*, HT-*, BR-*, PR-*).
+Requirements live in `docs/requirements.md` with IDs (CL-*, CG-*, AG-*, OW-*, CO-*, VR-*, TR-*,
+NP-*, HT-*, BR-*, PR-*).
 Code docstrings and test names reference these IDs. Start there before changing behaviour.
 
 ## Commands
@@ -50,11 +53,17 @@ web/ (static HTML/JS) -> api/ (FastAPI routes) -> services/ (use cases)
   (`integrations/ezyvet.py`) implements it by mapping ezyVet API records to domain models. The demo
   reads saved ezyVet list responses from `data/ezyvet/` (fictional clinic) through `FileSource`.
   `data/ezyvet/clinic_config.json` holds per-clinic settings ezyVet doesn't know.
-- `store/sqlite.py` holds only data the app owns (chat, proposals, requests, weights, consent,
-  reminders, check-ins, owner-given doses). Never copy clinic records into it (PR-3).
-- `services/home.py` builds the owner dashboard from pure rules in `domain/` (`checkins.py`,
-  `cover.py`, `forecast.py`). It never contacts the clinic; "Ask for a check-up" goes through
-  `OwnerAgentService.propose_checkup`, so AG-4 still holds. `data/demo_home.json` seeds check-ins.
+- `store/sqlite.py` holds only data the app owns (chat per owner and pet, proposals, requests,
+  weights, consent, reminders, check-ins, released recaps, ticks, triage answers). Never copy
+  clinic records into it (PR-3).
+- `services/home.py` builds each pet's page from pure rules in `domain/` (`estimates.py`,
+  `recaps.py`, `triage.py`, `pathway.py`, `checkins.py`, `forecast.py`). It never contacts the
+  clinic. Dashboard actions (estimate replies, triage requests, recap follow-ups, check-ups) go
+  through `OwnerAgentService.propose_*`, so they land in Ask as proposals and AG-4 still holds.
+- Owner endpoints take `?pet=`; `HomeService.pet` refuses pets the owner doesn't have (OW-1).
+  `data/demo_home.json` seeds check-ins and a released visit recap.
+- `domain/triage.py` is demo content: each clinic's vets approve their own symptom list. Keep its
+  red flags in step with `agent/safety.py` (AG-3).
 - `api/wiring.py` is the only place dependencies are chosen. Swap adapters there.
 - `web/` holds no business or agent logic; it renders what the API returns.
 
@@ -79,8 +88,9 @@ web/ (static HTML/JS) -> api/ (FastAPI routes) -> services/ (use cases)
   renderer in `web/owner.js` if it returns a card, teach `ScriptedModel` an intent if the offline
   demo should use it, and add a test.
 - **New card type**: one function in the `CARDS` map in `web/owner.js`. Follow `docs/design.md`.
-- **New dashboard tile**: a pure rule in `domain/`, a section in `HomeService.dashboard`, one
-  function in the `TILES` map in `web/dashboard.js`, a requirement ID and a test.
+- **New owner section**: a pure rule in `domain/`, a section in `HomeService.dashboard`, a
+  `<section class="tile">` slot in `web/owner.html`, one function in the `TILES` map in
+  `web/dashboard.js` (return "" to hide it), a requirement ID and a test.
 - **Real ezyVet**: a live `EzyVetSource` (OAuth, paging) in `integrations/ezyvet.py`, passed to
   `EzyVetPracticeSystem` in `api/wiring.py`. Demo data changes go in `data/ezyvet/` in the same shape. Respect 60 calls/min per endpoint and 180/min per database; cache reads.
 
@@ -96,6 +106,8 @@ web/ (static HTML/JS) -> api/ (FastAPI routes) -> services/ (use cases)
 ## Not built yet (next steps)
 
 - Real ezyVet adapter and partner approval (IDEXX), CSV import for pilots. See `docs/ezyvet.md`.
-- Auth and multi-tenant clinics/owners (demo uses one owner `o1` with pet `p1`).
+- Auth and multi-tenant clinics/owners (demo signs in as one owner, Priya `501`, with Biscuit,
+  Mango and Pip).
+- Clinic-side recap editor and estimate publishing (the demo seeds both); medication log.
 - Reminder delivery (SMS/email), payments (Stripe direct debit), plan builder.
 - Evals for the Claude path: urgent-symptom recall, no-diagnosis checks, proposal-not-claimed checks.

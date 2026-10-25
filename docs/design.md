@@ -1,7 +1,7 @@
 # Design: "Field notebook"
 
-Flat, warm and minimal, built around the pet. The owner app is a dashboard of tiles with the
-assistant beside it (a tab on phones). The clinic view uses the same parts.
+Flat, warm and minimal, built around the pet. The owner app is a page per pet (tabs at the top)
+with the assistant beside it (a tab on phones). The clinic view uses the same parts.
 
 ## Where it comes from
 
@@ -33,8 +33,12 @@ assistant beside it (a tab on phones). The clinic view uses the same parts.
   random from the owner's pets on each visit by `paintMark()`. The silhouettes come from
   game-icons.net (CC BY 3.0: dog, rabbit and kiwi by Delapouite, cat by Lorc). Keep the credit
   on the landing page and in the README.
-- **Tiles answer one question each:** what needs attention, how they've been this week, are they
-  protected, what will this year cost, and their weight. Each has at most one primary action.
+- **Sections answer one owner moment each:** what will it cost (Costs), what did the vet say (Last
+  visit), should I come in ("Something not right?", always visible near the top), what does a new
+  pet need (First 90 days), what's next (Coming up) and, for seniors, how they've been (Check-in).
+  Each has at most one primary action. Empty sections hide.
+- **Triage outcomes use the status colours:** red card for "Call now" (with phone buttons), clay
+  for "within 24 hours", sage tint for "keep an eye on it". Always in words, never a condition.
 - **Contrast (WCAG AA), measured:** muted text 5.9 on ground, overdue text 5.7, white on sage
   6.1, control edges (`--edge`) 3.3, urgent text 5.8 on its tint. Check any new colour first.
 - **Don't decorate.** No illustrations, gradients or paw wallpaper. The clinic list stays dense.

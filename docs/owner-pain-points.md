@@ -134,14 +134,20 @@ problem to fix.
   - Nutrition is the top question owners ask AI, but 71% trust their vet most (*sponsor*).
 - *Answer:* a field inside the med and chronic programs, not a tile of its own.
 
-## What happens to today's features
+## What we built
 
-| Feature | Decision | Why |
+We chose to build **#1, #3, #4 and #5** first. #2 (medication log) is next on the roadmap.
+
+| Pain point | Built as | Requirement IDs |
 |---|---|---|
-| 12-month cost forecast (HT-4) | **Fold into #1** | Forecasting alone doesn't sell. Pricing a real estimate the owner is deciding on does. The plan-against-pay-as-you-go logic carries over. |
-| Parasite cover (HT-5, HT-6) | **Fold into #2** | It becomes the preventive half of the med log. The money is in "running low → refill proposal". |
-| Weekly check-in (HT-1 to HT-3) | **Keep, demote** | Senior and chronic pets only, with validated scales. It's the data moat and the year-2 premium module, not the front door. |
-| Weight tile | **Drop as a tile** | Keep weight logging in the assistant (AG-5) and as a field in chronic programs. |
+| #1 Cost surprise | **Costs**: the estimate inbox plus the year ahead (the old 12-month forecast folded in) | CO-1 to CO-4, HT-4 |
+| #3 Forgetting what the vet said | **Last visit**: the recap, instructions with day counts, results, follow-up and questions | VR-1 to VR-3 |
+| #4 "Should I go to the vet?" | **Something not right?**: call now, within 24 hours, or keep an eye on it | TR-1 to TR-5 |
+| #5 New pet overwhelm | **First 90 days**: vaccine course, home steps, weekly tip, young-pet plan | NP-1, NP-2 |
+| (kept) Slow decline | **Weekly check-in**, senior pets only | HT-1 to HT-3 |
+
+Retired from the earlier dashboard: parasite cover (to come back inside the medication log) and
+the weight tile (weight stays an assistant action).
 
 ## Hero bundle and the pilot metric
 
