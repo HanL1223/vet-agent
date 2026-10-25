@@ -72,7 +72,7 @@ web/ (static HTML/JS) -> api/ (FastAPI routes) -> services/ (use cases)
 - **New agent tool**: write the handler in `agent/tools.py`, register it in `TOOLS`, add a card
   renderer in `web/owner.js` if it returns a card, teach `ScriptedModel` an intent if the offline
   demo should use it, and add a test.
-- **New card type**: one function in the `CARDS` map in `web/owner.js`.
+- **New card type**: one function in the `CARDS` map in `web/owner.js`. Follow `docs/design.md`.
 - **Real ezyVet**: new class in `integrations/` implementing `PracticeSystem`, chosen in
   `api/wiring.py`. Respect 60 calls/min per endpoint and 180/min per database; cache reads.
 

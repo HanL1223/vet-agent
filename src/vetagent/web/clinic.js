@@ -1,7 +1,7 @@
 // Clinic dashboard: KPIs, care-gap radar, plans and owner requests.
 
 const FILTERS = [
-  ["", "All"], ["vaccination", "Vaccines"], ["parasite", "Parasite"],
+  ["", "All"], ["vaccination", "Vaccines"], ["parasite", "Flea & worming"],
   ["senior", "Senior"], ["dental", "Dental"],
 ];
 const state = { filter: "", rows: [] };
@@ -12,15 +12,15 @@ async function loadSummary() {
   const day = new Date(s.today + "T00:00:00");
   document.getElementById("today").textContent =
     day.toLocaleDateString("en-AU", { weekday: "long", day: "numeric", month: "long" }) +
-    " · care gaps refreshed from clinic records";
+    " · updated from clinic records";
   const kpis = [
     ["Plan members", s.plan_members, ""],
-    ["Recurring plan revenue", money(s.monthly_plan_revenue) + " /month", ""],
-    ["Pets with open care gaps", s.pets_with_gaps, `of ${s.active_pets} active pets`],
-    ["Care value at risk", money(s.value_at_risk), `${s.reminders_sent} reminder${s.reminders_sent === 1 ? "" : "s"} sent`],
+    ["Recurring plan revenue", money(s.monthly_plan_revenue), "a month"],
+    ["Pets due for care", s.pets_with_gaps, `of ${s.active_pets} active pets`],
+    ["Care waiting to be booked", money(s.value_at_risk), `${s.reminders_sent} reminder${s.reminders_sent === 1 ? "" : "s"} sent`],
   ];
   document.getElementById("kpis").innerHTML = kpis.map(([label, value, note]) => `
-    <div class="card kpi"><span class="muted small">${esc(label)}</span><b>${esc(value)}</b>
+    <div class="kpi"><span class="muted small">${esc(label)}</span><b>${esc(value)}</b>
     <span class="muted small">${esc(note)}</span></div>`).join("");
 }
 
@@ -35,31 +35,34 @@ async function loadGaps() {
   state.rows = await api("/api/clinic/care-gaps" + query);
   const html = state.rows.map((r) => `
     <div class="row">
-      <div class="who">
-        <b>${esc(r.pet)}</b> <span class="muted small">${esc(r.breed)}</span>
-        ${r.member ? '<span class="pill">Plan member</span>' : ""}
-        <div class="muted small">Owner: ${esc(r.owner)}</div>
+      <div class="pet">
+        <div class="pet-face">${petIcon(r.species)}</div>
+        <div style="min-width: 0">
+          <b>${esc(r.pet)}</b> ${r.member ? '<span class="pill">Plan member</span>' : ""}
+          <div class="muted small">${esc(r.breed)} · ${esc(r.owner)}</div>
+        </div>
       </div>
-      <div class="what"><div style="font-weight: 600">${esc(r.title)}</div>
+      <div class="what"><div style="font-weight: 700">${esc(r.title)}</div>
         <div class="muted small">${esc(r.reason)}</div></div>
-      <div class="when"><div class="${r.overdue ? "overdue" : "soon"}">${esc(r.due_label)}</div>
-        <div class="muted small">${money(r.value)} value</div></div>
+      <div class="when"><div class="status ${r.overdue ? "overdue" : "soon"}">${esc(r.due_label)}</div>
+        <div class="muted small">${money(r.value)}</div></div>
       <div class="act">${r.reminded
-        ? '<span class="sent">Reminder sent</span>'
-        : `<button class="btn" data-remind="${esc(r.key)}">Send reminder</button>`}</div>
+        ? '<span class="sent">&#10003; Reminded</span>'
+        : `<button class="btn ghost" data-remind="${esc(r.key)}" aria-label="Remind ${esc(r.owner)} about ${esc(r.pet)}">Remind</button>`}</div>
     </div>`).join("");
   document.getElementById("gap-rows").innerHTML =
-    html || '<p class="empty muted">No open care gaps for this filter.</p>';
+    html || '<p class="empty muted">Nothing due for this filter. Nice work.</p>';
 }
 
 async function loadPlans() {
   const plans = await api("/api/clinic/plans");
   document.getElementById("plans").innerHTML = plans.map((p) => `
     <div class="card plan">
-      <div style="display: flex; justify-content: space-between"><b>${esc(p.name)}</b>
-        <span class="muted small">${p.members} members</span></div>
-      <div style="font-size: 28px; font-weight: 700">${money(p.monthly_price)}
-        <span class="muted small">/month per pet</span></div>
+      <div style="display: flex; justify-content: space-between; align-items: baseline">
+        <b class="serif" style="font-size: 19px">${esc(p.name)}</b>
+        <span class="pill">${p.members} member${p.members === 1 ? "" : "s"}</span></div>
+      <div><span class="price">${money(p.monthly_price)}</span>
+        <span class="muted small">a month per pet</span></div>
       <ul>${p.benefits.map((b) => `<li>${esc(b)}</li>`).join("")}</ul>
     </div>`).join("");
 }
@@ -68,12 +71,12 @@ async function loadRequests() {
   const reqs = await api("/api/clinic/requests");
   const label = { booking_request: "Booking request", vet_note: "Note for the vet" };
   document.getElementById("requests").innerHTML = reqs.map((r) => `
-    <div class="row">
-      <div class="who"><b>${esc(r.pet)}</b><div class="muted small">${esc(label[r.kind] || r.kind)}</div></div>
+    <div class="row req">
+      <div><b>${esc(r.pet)}</b><div class="muted small">${esc(label[r.kind] || r.kind)}</div></div>
       <div class="what">${esc(r.detail)}</div>
-      <div class="when muted small">${new Date(r.created_at).toLocaleString("en-AU")}</div>
+      <div class="when muted small">${new Date(r.created_at).toLocaleString("en-AU", { day: "numeric", month: "short", hour: "numeric", minute: "2-digit" })}</div>
     </div>`).join("") ||
-    '<p class="empty muted">No requests yet. Confirm a booking in the owner agent to see one here.</p>';
+    '<p class="empty muted">No requests yet. Send a booking from the owner app and it will show up here.</p>';
 }
 
 async function remind(keys) {
@@ -111,6 +114,7 @@ document.addEventListener("click", async (event) => {
   }
 });
 
+document.getElementById("logo").innerHTML = PAW;
 renderFilters();
 loadSummary();
 loadGaps();

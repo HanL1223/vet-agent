@@ -1,61 +1,81 @@
+/* "Oat & Sage": warm neutrals, sage for actions only, terracotta for overdue, red for urgent. */
 :root {
-  --ground: #f4f7f6;
+  --ground: #fbf7f1;
   --surface: #ffffff;
-  --ink: #13201c;
-  --ink-2: #24332e;
-  --muted: #5b6662;
-  --line: #dde5e2;
-  --line-soft: #eef3f1;
-  --brand: #0e7c66;
-  --brand-dark: #0a5c4c;
-  --brand-tint: #e1f3ee;
-  --warn: #9a5a00;
-  --warn-tint: #fdf1dc;
-  --warn-line: #f0d3a4;
-  --danger: #8c1d18;
-  --danger-tint: #fff4f2;
-  --danger-line: #e8b4ab;
-  --radius: 12px;
-  font-family: "Plus Jakarta Sans", system-ui, sans-serif;
+  --sunk: #f5efe6;
+  --ink: #2b2622;
+  --ink-2: #463e37;
+  --muted: #6b5f54;
+  --line: #ebe2d6;
+  --edge: #968878; /* 3:1 edge for interactive outlines */
+  --sage: #3f6b4f;
+  --sage-dark: #30543d;
+  --sage-tint: #e7efe7;
+  --clay: #a3441f; /* overdue text */
+  --clay-dot: #b5532f;
+  --clay-tint: #fbede5;
+  --urgent: #b3261e;
+  --urgent-tint: #fdeceb;
+  --honey: #f3e3c3;
+  --honey-ink: #6b4a1a;
+  --radius: 16px;
+  --shadow: 0 1px 2px rgba(64, 44, 24, .06), 0 4px 16px rgba(64, 44, 24, .05);
+  font-family: "Nunito Sans", system-ui, sans-serif;
   color: var(--ink);
 }
 
 * { box-sizing: border-box; }
-body { margin: 0; background: var(--ground); }
+body { margin: 0; background: var(--ground); line-height: 1.5; }
 button, input { font: inherit; }
 button { cursor: pointer; }
-a { color: var(--brand); }
-a:hover { color: var(--brand-dark); }
+a { color: var(--sage); text-underline-offset: 3px; }
+a:hover { color: var(--sage-dark); }
 h1, h2, h3, p { margin: 0; }
-:focus-visible { outline: 3px solid #6fb8a6; outline-offset: 2px; }
+h1, h2, .serif { font-family: "Fraunces", Georgia, serif; font-weight: 500; letter-spacing: -.01em; }
+:focus-visible { outline: 2px solid var(--sage); outline-offset: 2px; }
 
 .muted { color: var(--muted); }
 .small { font-size: 13px; }
 .pill {
-  display: inline-block; font-size: 11px; font-weight: 700; padding: 3px 8px;
-  border-radius: 999px; color: var(--brand-dark); background: var(--brand-tint);
+  display: inline-block; font-size: 12px; font-weight: 700; padding: 2px 8px;
+  border-radius: 999px; color: var(--sage-dark); background: var(--sage-tint);
 }
-.pill.warn { color: #7a4a00; background: var(--warn-tint); }
 
 .btn {
-  min-height: 44px; padding: 0 16px; border-radius: 10px; font-size: 14px; font-weight: 700;
-  border: 1px solid var(--brand); background: var(--brand); color: #fff;
+  min-height: 44px; padding: 0 18px; border-radius: 999px; font-size: 14px; font-weight: 700;
+  border: 1.5px solid var(--sage); background: var(--sage); color: #fff;
 }
-.btn:hover { background: var(--brand-dark); }
-.btn.ghost { background: var(--surface); color: var(--brand-dark); }
-.btn.ghost:hover { background: var(--brand-tint); }
-.btn.danger { background: var(--danger); border-color: var(--danger); }
+.btn:hover { background: var(--sage-dark); border-color: var(--sage-dark); }
+.btn.ghost { background: var(--surface); color: var(--sage-dark); }
+.btn.ghost:hover { background: var(--sage-tint); }
 .btn[disabled] { opacity: 0.6; cursor: default; }
 
 .chip {
   min-height: 36px; padding: 0 14px; border-radius: 999px; font-size: 13px; font-weight: 600;
-  border: 1px solid #c9d6d1; background: var(--surface); color: var(--ink-2);
+  border: 1px solid var(--edge); background: var(--surface); color: var(--ink-2);
 }
-.chip[aria-pressed="true"] { background: var(--brand); border-color: var(--brand); color: #fff; }
+.chip:hover { border-color: var(--sage); }
+.chip[aria-pressed="true"] { background: var(--ink); border-color: var(--ink); color: #fff; }
 
-.card {
-  background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius);
+.card { background: var(--surface); border-radius: var(--radius); box-shadow: var(--shadow); }
+
+/* Round portrait for a pet; the glyph comes from petIcon() in common.js. */
+.pet-face {
+  flex: none; width: 40px; height: 40px; border-radius: 50%; background: var(--honey);
+  color: var(--honey-ink); display: grid; place-items: center;
 }
+.pet-face svg { width: 62%; height: 62%; }
+
+/* Status: words carry the meaning, the dot only reinforces it. */
+.status { display: inline-flex; align-items: center; gap: 8px; font-weight: 700; }
+.status::before {
+  content: ""; width: 8px; height: 8px; border-radius: 50%; flex: none;
+  border: 2px solid var(--sage);
+}
+.status.overdue { color: var(--clay); }
+.status.overdue::before { background: var(--clay-dot); border-color: var(--clay-dot); }
+.status.soon { color: var(--sage-dark); }
+
 .sr-only {
   position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap;
 }

@@ -13,6 +13,7 @@ from vetagent.store.sqlite import Store
 class GapRow:
     key: str
     pet: str
+    species: str
     breed: str
     owner: str
     member: bool
@@ -57,6 +58,7 @@ class ClinicService:
                 GapRow(
                     key=gap_key(gap),
                     pet=pet.name,
+                    species=pet.species,
                     breed=f"{pet.breed}, {pet.age_on(self._today)} yrs",
                     owner=self._practice.owner(pet.owner_id).name,
                     member=pet.id in members,

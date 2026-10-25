@@ -40,7 +40,12 @@ class OwnerAgentService:
         consent = self._store.consent(self._owner_id)
         return {
             "clinic": self._practice.clinic_name(),
-            "pet": {"name": pet.name, "breed": pet.breed, "age": pet.age_on(self._today)},
+            "pet": {
+                "name": pet.name,
+                "species": pet.species,
+                "breed": pet.breed,
+                "age": pet.age_on(self._today),
+            },
             "owner": self._first_name(),
             "model": self._model.name,
             "consent": {
