@@ -87,7 +87,7 @@ web/ (static HTML/JS) -> api/ (FastAPI routes) -> services/ (use cases)
 
 ## Not built yet (next steps)
 
-- Real ezyVet adapter and partner approval (IDEXX), CSV import for pilots.
+- Real ezyVet adapter and partner approval (IDEXX), CSV import for pilots. See `docs/ezyvet.md`.
 - Auth and multi-tenant clinics/owners (demo uses one owner `o1` with pet `p1`).
 - Reminder delivery (SMS/email), payments (Stripe direct debit), plan builder.
 - Evals for the Claude path: urgent-symptom recall, no-diagnosis checks, proposal-not-claimed checks.

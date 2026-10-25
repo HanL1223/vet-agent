@@ -29,7 +29,7 @@ class PracticeSystem(Protocol):
 
 
 class SeedPracticeSystem:
-    """Reads a JSON export shaped like the ezyVet data the app needs."""
+    """Reads demo data in the app's own shape. docs/ezyvet.md maps each field to ezyVet."""
 
     def __init__(self, path: Path = SEED_PATH) -> None:
         raw = json.loads(path.read_text())
