@@ -23,6 +23,13 @@ const TILES = {
     return triageResult ? triageOutcome(b) : triageForm(b);
   },
 
+  nearby: (b) => b.nearby.map((n) => `
+    <div class="notice ${esc(n.kind)}">
+      <b>${esc(n.title)}</b>
+      <p class="small">${esc(n.text)}</p>
+      <span class="muted small">From ${esc(n.source)} open data</span>
+    </div>`).join(""),
+
   costs: (b) => {
     const c = b.costs;
     const estimates = c.estimates.map((e) => estimateCard(e, c.payment_options)).join("");
@@ -199,6 +206,7 @@ function triageOutcome(b) {
     </div>
     <div class="actions">${action}</div>
     ${r.level === "call_now" ? "" : `<p class="muted small">Closed? ${esc(b.contact.emergency_name)}: <a href="${tel(b.contact.emergency_phone)}">${esc(b.contact.emergency_phone)}</a></p>`}
+    ${b.contact.emergency_source ? `<p class="muted small">After-hours vet from ${esc(b.contact.emergency_source)}.</p>` : ""}
     <button class="link" data-triage-again>Start again</button>`;
 }
 

@@ -1,0 +1,102 @@
+{
+ "_source": {
+  "source": "PubCRIS register of agricultural and veterinary chemical products",
+  "url": "https://data.gov.au/data/dataset/0de37904-43e0-4814-b21b-5b64fafefe6f",
+  "publisher": "Australian Pesticides and Veterinary Medicines Authority",
+  "licence": "CC BY 3.0 AU",
+  "fetched": "2026-10-25"
+ },
+ "labels": [
+  {
+   "product_id": "302",
+   "apvma_number": "68870",
+   "name": "BRAVECTO 1000 MG FLURALANER CHEWABLE TABLETS FOR LARGE DOGS",
+   "registrant": "INTERVET AUSTRALIA PTY LIMITED",
+   "expires": "2027-06-30",
+   "uses": {
+    "dog": [
+     "brown dog tick",
+     "bush tick",
+     "demodectic mange",
+     "ear mange mite",
+     "flea allergic dermatitis",
+     "fleas",
+     "paralysis tick",
+     "sarcoptic mange scabies mite",
+     "tapeworm - dipylidium caninum"
+    ]
+   }
+  },
+  {
+   "product_id": "303",
+   "apvma_number": "51805",
+   "name": "PROHEART SR-12 INJECTION ONCE-A-YEAR HEARTWORM PREVENTATIVE FOR DOGS",
+   "registrant": "ZOETIS AUSTRALIA PTY LTD",
+   "expires": "2027-06-30",
+   "uses": {
+    "dog": [
+     "heartworm",
+     "hookworm - ancylostoma caninum",
+     "hookworm - uncinaria stenocephala"
+    ]
+   }
+  },
+  {
+   "product_id": "306",
+   "apvma_number": "35824",
+   "name": "DRONTAL ALLWORMER FOR LARGE DOGS",
+   "registrant": "VETOQUINOL AUSTRALIA PTY LTD",
+   "expires": "2027-06-30",
+   "uses": {
+    "dog": [
+     "giardia spp.",
+     "hookworm - ancylostoma braziliense",
+     "hookworm - ancylostoma caninum",
+     "hookworm - ancylostoma ceylanicum",
+     "hookworm - bunostomum spp.",
+     "hookworm - uncinaria stenocephala",
+     "hydatid tapeworm",
+     "roundworm",
+     "roundworm - toxascaris leonina",
+     "roundworm - toxocara canis",
+     "tapeworm",
+     "tapeworm - dipylidium caninum",
+     "tapeworm - taenia spp.",
+     "whipworm - trichuris vulpis"
+    ]
+   }
+  }
+ ],
+ "registered": [
+  {
+   "species": "cat",
+   "pest": "fleas",
+   "products": 107
+  },
+  {
+   "species": "cat",
+   "pest": "heartworm",
+   "products": 52
+  },
+  {
+   "species": "cat",
+   "pest": "paralysis tick",
+   "products": 25
+  },
+  {
+   "species": "dog",
+   "pest": "fleas",
+   "products": 276
+  },
+  {
+   "species": "dog",
+   "pest": "heartworm",
+   "products": 178
+  },
+  {
+   "species": "dog",
+   "pest": "paralysis tick",
+   "products": 116
+  }
+ ]
+}

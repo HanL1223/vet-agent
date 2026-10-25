@@ -55,6 +55,11 @@ def plans(request: Request) -> list[dict]:
     return _services(request).clinic.plans()
 
 
+@clinic.get("/local")
+def local_area(request: Request) -> dict:
+    return _services(request).local.clinic_view()
+
+
 @clinic.get("/requests")
 def requests_from_owners(request: Request) -> list[dict]:
     return _services(request).clinic.clinic_requests()

@@ -1,0 +1,39 @@
+{
+ "_source": {
+  "source": "7-day forecast, apparent (feels-like) maximum temperature",
+  "url": "https://open-meteo.com/",
+  "publisher": "Open-Meteo.com",
+  "licence": "CC BY 4.0; the free API is for non-commercial use",
+  "fetched": "2026-10-25"
+ },
+ "days": [
+  {
+   "day": "2026-10-26",
+   "feels_like_max": 33.0
+  },
+  {
+   "day": "2026-10-27",
+   "feels_like_max": 33.8
+  },
+  {
+   "day": "2026-10-28",
+   "feels_like_max": 33.0
+  },
+  {
+   "day": "2026-10-29",
+   "feels_like_max": 34.3
+  },
+  {
+   "day": "2026-10-30",
+   "feels_like_max": 33.4
+  },
+  {
+   "day": "2026-10-31",
+   "feels_like_max": 32.5
+  },
+  {
+   "day": "2026-11-01",
+   "feels_like_max": 33.5
+  }
+ ]
+}

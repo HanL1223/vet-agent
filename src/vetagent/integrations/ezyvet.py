@@ -188,6 +188,7 @@ class EzyVetPracticeSystem:
                         detail=group["label"],
                         repeat_days=group["lasts_days"],
                         price_key=group["price_key"],
+                        product_id=str(line["product_id"]),
                     )
                 )
         return events

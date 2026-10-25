@@ -1,0 +1,28 @@
+{
+ "_source": {
+  "source": "Ixodes holocyclus (Australian paralysis tick) occurrence records",
+  "url": "https://biocache.ala.org.au/occurrences/search?q=taxa%3A%22Ixodes%20holocyclus%22",
+  "publisher": "Atlas of Living Australia",
+  "licence": "Per-record licences, mostly CC BY; see the ALA data providers",
+  "fetched": "2026-10-25"
+ },
+ "state": "Queensland",
+ "state_by_month": {
+  "1": 19,
+  "2": 4,
+  "3": 10,
+  "4": 15,
+  "5": 23,
+  "6": 28,
+  "7": 46,
+  "8": 87,
+  "9": 111,
+  "10": 137,
+  "11": 85,
+  "12": 54
+ },
+ "local": {
+  "radius_km": 100,
+  "records": 10
+ }
+}

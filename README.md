@@ -4,7 +4,9 @@ Demo of a vet care-plan platform for independent clinics on ezyVet:
 
 - **Clinic dashboard**: a care-gap radar that ranks overdue care by value, one-click reminders,
   estimates to check and send to owners, visit recaps to write and release, care plans, and
-  requests that owners sent from the app.
+  requests that owners sent from the app, and a **Local area** tab built from Australian open
+  data (pets registered nearby, paralysis tick season, the nearest 24-hour vet, the week's heat,
+  and a label check of the clinic's parasite products).
 - **Owner app**: a page per pet, branded as the clinic, built around the moments owners get stuck:
   - **Costs:** the clinic's estimates in plain language, with what the plan includes and the year
     ahead.
@@ -12,6 +14,7 @@ Demo of a vet care-plan platform for independent clinics on ezyVet:
   - **Something not right?:** call now, see a vet within 24 hours, or keep an eye on it.
   - **First 90 days:** for new puppies and kittens.
   - **Weekly check-in:** for senior pets.
+  - **Near you:** tick-season and hot-day notices from open data.
 - **Care assistant** (beside the dashboard): raises what's due, checks plan value honestly, logs
   weights with consent, drafts notes for the vet, and prepares bookings. Anything that contacts
   the clinic waits for the owner to confirm. Urgent symptoms skip the model and tell the owner to
@@ -19,6 +22,7 @@ Demo of a vet care-plan platform for independent clinics on ezyVet:
 
 `docs/business-model.md` explains the business: who pays, the pain points, and the data it
 builds. `docs/owner-pain-points.md` has the ranked research behind the owner app.
+`docs/open-data.md` covers the five public data sources and what each one feeds.
 
 Runs offline with no API key (a scripted model drives the same agent loop and tools).
 Add an Anthropic API key to use Claude.
@@ -47,6 +51,7 @@ The first run creates `.env` from `.env.example`. To use Claude, set `ANTHROPIC_
 | Run with auto-reload while coding | `uv run vetagent --reload` |
 | Wipe demo state and run | `uv run vetagent --reset` |
 | Tests | `uv run pytest` |
+| Refresh the open-data snapshots | `uv run vetagent-open-data` |
 | Lint and format check | `uv run ruff check src tests` and `uv run ruff format --check src tests` |
 
 ## Five-minute walkthrough
@@ -73,6 +78,11 @@ Mango (cockatiel) and Pip (9-week-old kitten).
    that she replied. Edit a line's wording and send again: her Costs section updates.
 9. **Visit recaps**: write one for Pip (patient, summary, an instruction with days, a result) and
    release it. It appears under Last visit in Priya's app.
+10. **Local area**: real Townsville data around the (fictional) clinic in Kirwan. Pets
+    registered nearby and where desexing outreach would reach most, the paralysis tick season (in
+    season now, so Biscuit's and Pip's pages show a "Near you" notice), JCU Vet as the nearest
+    24-hour vet (the number on "Call now"), the week's feels-like temperatures, and the clinic's
+    parasite products checked against their APVMA labels.
 
 The mark at the top left is one of Priya's pets, picked at random on each visit. *Start over*
 resets the current pet's conversation; `uv run vetagent --reset` wipes all demo state.
@@ -83,13 +93,15 @@ resets the current pet's conversation; `uv run vetagent --reset` wipes all demo 
 src/vetagent/
   domain/        pure rules: care gaps, plan value, estimates, recaps, triage, new-pet
                  pathway, check-in trend, cost forecast
-  integrations/  PracticeSystem port + ezyVet adapter (mapping: docs/ezyvet.md)
+  integrations/  PracticeSystem port + ezyVet adapter (mapping: docs/ezyvet.md);
+                 open-data snapshot reader and refresh command (docs/open-data.md)
   store/         SQLite for app-owned data
   agent/         loop, tools, safety gate, prompts, model adapters
   services/      clinic dashboard, owner dashboard (home.py) and owner agent use cases
   api/           FastAPI routes and wiring
   web/           static pages (no framework, no build step)
   data/ezyvet/   demo clinic as saved ezyVet API responses (fictional)
+  data/open/     aggregate snapshots of Australian open data (real, attributed)
   data/demo_home.json   demo app-owned data (8 weeks of check-ins, a released visit recap)
 docs/requirements.md   requirement IDs referenced by code and tests
 tests/                 pytest
@@ -101,3 +113,8 @@ See `CLAUDE.md` for architecture rules and how to extend it.
 
 Pet silhouettes from [game-icons.net](https://game-icons.net), CC BY 3.0: sitting dog, rabbit
 and kiwi by Delapouite, cat by Lorc.
+
+Open data: Townsville City Council animal registrations (CC BY 4.0); APVMA PubCRIS (CC BY 3.0
+AU); Atlas of Living Australia occurrence records (per-record licences); map data
+© OpenStreetMap contributors (ODbL 1.0); weather data by [Open-Meteo.com](https://open-meteo.com/)
+(CC BY 4.0). Details in `docs/open-data.md`.

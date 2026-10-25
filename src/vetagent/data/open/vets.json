@@ -1,0 +1,84 @@
+{
+ "_source": {
+  "source": "amenity=veterinary within the radius of the clinic",
+  "url": "https://www.openstreetmap.org/copyright",
+  "publisher": "\u00a9 OpenStreetMap contributors",
+  "licence": "ODbL 1.0",
+  "fetched": "2026-10-25"
+ },
+ "radius_km": 30,
+ "vets": [
+  {
+   "name": "Bayside Vet Clinic",
+   "lat": -19.24452,
+   "lon": 146.79823,
+   "phone": "",
+   "emergency": false,
+   "hours": "",
+   "osm": "node/13708127081"
+  },
+  {
+   "name": "Greencross Vets",
+   "lat": -19.31092,
+   "lon": 146.73017,
+   "phone": "+61 7 4773 3744",
+   "emergency": false,
+   "hours": "Mo-Fr 08:00-18:00; Sa 08:00-15:00; Su,PH off",
+   "osm": "node/11007067845"
+  },
+  {
+   "name": "Greencross Vets",
+   "lat": -19.27063,
+   "lon": 146.77928,
+   "phone": "+61 7 4771 4050",
+   "emergency": false,
+   "hours": "",
+   "osm": "node/11387222784"
+  },
+  {
+   "name": "Greencross Vets",
+   "lat": -19.29569,
+   "lon": 146.77028,
+   "phone": "",
+   "emergency": false,
+   "hours": "",
+   "osm": "node/11936843471"
+  },
+  {
+   "name": "JCU Vet",
+   "lat": -19.3233,
+   "lon": 146.76408,
+   "phone": "1300 528 838",
+   "emergency": true,
+   "hours": "24/7",
+   "osm": "node/11652098127"
+  },
+  {
+   "name": "North Shore Townsville Clinic",
+   "lat": -19.2539,
+   "lon": 146.70247,
+   "phone": "+61 7 4774 8764",
+   "emergency": false,
+   "hours": "Mo 08:00-17:30; Tu 08:00-19:00; We-Fr 08:00-17:30; Sa 09:00-15:00; Su off",
+   "osm": "node/12136879696"
+  },
+  {
+   "name": "Palmsvets Bayside",
+   "lat": -19.24447,
+   "lon": 146.79821,
+   "phone": "",
+   "emergency": false,
+   "hours": "",
+   "osm": "node/13708127082"
+  },
+  {
+   "name": "Patrick Street Vets",
+   "lat": -19.29791,
+   "lon": 146.76771,
+   "phone": "+61 7 4728 1550",
+   "emergency": false,
+   "hours": "Mo-Tu 08:00-18:00; We off; Th-Fr 08:00-18:00; Sa 08:00-12:00; Su off",
+   "osm": "way/1311155559"
+  }
+ ]
+}

@@ -11,10 +11,12 @@ dependencies = [
     "python-dotenv>=1.0",
     "openai>=3.37.0",
     "tzdata>=2026.5",
+    "openpyxl>=3.1.5",
 ]
 
 [project.scripts]
 vetagent = "vetagent.cli:main"
+vetagent-open-data = "vetagent.integrations.open_data_refresh:main"
 
 [dependency-groups]
 dev = [
@@ -31,7 +33,7 @@ build-backend = "setuptools.build_meta"
 where = ["src"]
 
 [tool.setuptools.package-data]
-vetagent = ["web/*", "data/*.json", "data/ezyvet/*.json"]
+vetagent = ["web/*", "data/*.json", "data/ezyvet/*.json", "data/open/*.json"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

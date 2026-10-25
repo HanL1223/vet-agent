@@ -71,6 +71,19 @@ Retired: HT-5 and HT-6 (parasite cover and home-given doses) and the weight tile
 folds them into a future medication log (pain point #2). Weight logging stays an assistant
 action (AG-5).
 
+## Open data about the clinic's area (OD)
+
+Sources, licences and what each one showed: `docs/open-data.md`.
+
+| ID | Requirement |
+| --- | --- |
+| OD-1 | **Pets around the clinic.** From council registrations, the clinic sees dogs and cats registered in its catchment suburbs, the share desexed, and the five suburbs with the most pets not desexed (where outreach reaches most). |
+| OD-2 | **Label check.** Each parasite product the clinic sells is linked to its APVMA registration. The clinic sees the label's species and key pests, whether the registration is current, and a warning when a product was dispensed to a species the label doesn't list. It never suggests a medicine. |
+| OD-3 | **Tick season.** From ALA records, the season is the months with at least an average month's share of the state's paralysis tick records. In season, dog and cat owners see a notice under Near you; the clinic sees the monthly shape and the count near the clinic. Shown as a season, never as a risk score. |
+| OD-4 | **After-hours vet.** The owner's emergency number is the nearest vet on OpenStreetMap tagged as an emergency vet or open 24/7, with a phone number, with attribution. With none, the clinic's own after-hours line is used. |
+| OD-5 | **Hot days.** When the forecast has a day from today within 7 days that feels like 35 °C or more, dog owners see a notice. A stale forecast shows nothing. |
+| OD-6 | **Snapshots.** The app reads aggregate snapshots only (no row-level records, no personal data), each with its publisher, licence and fetch date, shown on the Local area tab. A missing snapshot means no data, not an error. `uv run vetagent-open-data` refreshes them. |
+
 ## Consent and privacy
 
 | ID | Requirement |
