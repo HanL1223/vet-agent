@@ -49,8 +49,9 @@ The first run creates `.env` from `.env.example`. To use Claude, set `ANTHROPIC_
 
 1. **Clinic dashboard** (`/clinic`): 8 care gaps worth $1,802, ranked by value. Biscuit carries
    a "Home check-ins: mobility down" tag from Priya's weekly check-ins.
-2. **Owner dashboard** (`/owner`): Biscuit's check-in tile says mobility has been lower for two
-   weeks. Tap **Ask for a check-up**, then **Send to clinic**. Nothing is sent before that tap.
+2. **Owner dashboard** (`/owner`): the mark at the top left is one of Priya's pets (Biscuit or
+   Mango, her cockatiel), picked at random on each visit. Biscuit's check-in tile says mobility has
+   been lower for two weeks. Tap **Ask for a check-up**, then **Send to clinic**. Nothing is sent before that tap.
 3. **Next 12 months of care**: $944 pay-as-you-go against $708 on his Senior plan.
 4. **Parasite cover**: 85% of the last year for flea and tick, with two gaps. Tap **Given today**.
 5. Do this week's check-in (**Update this week** if you've already done one).

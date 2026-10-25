@@ -1,5 +1,6 @@
 """Owner care-agent use cases: open the chat, take a message, confirm or dismiss proposals."""
 
+import uuid
 from datetime import date
 
 from vetagent.agent.display import to_chat_items
@@ -7,6 +8,7 @@ from vetagent.agent.llm import Model
 from vetagent.agent.loop import run_turn
 from vetagent.agent.prompts import system_prompt
 from vetagent.agent.tools import ToolContext, run_tool
+from vetagent.domain import checkins as ci
 from vetagent.integrations.practice import PracticeSystem
 from vetagent.store.sqlite import Consent, Store
 
@@ -97,7 +99,11 @@ class OwnerAgentService:
 
     def propose_checkup(self) -> dict:
         """HT-2: the dashboard's "Ask for a check-up" becomes a booking proposal (AG-4)."""
+        checkins = [ci.CheckIn(w, s) for w, s in self._store.checkins(self._ctx.pet_id)]
+        if not ci.trend(checkins, self._today).dropping:
+            raise ProposalError("Check-ins aren't showing a drop; book from Needs attention")
         pet = self._practice.pet(self._ctx.pet_id).name
+        call_id = f"checkup_{uuid.uuid4().hex[:8]}"  # model APIs reject repeated tool-call ids
         args = {
             "reason": f"Check-up: {pet}'s home check-ins have dropped",
             "preferred_time": "next available",
@@ -108,11 +114,11 @@ class OwnerAgentService:
             {
                 "role": "assistant",
                 "text": "",
-                "tool_calls": [{"id": "checkup", "name": "propose_booking", "args": args}],
+                "tool_calls": [{"id": call_id, "name": "propose_booking", "args": args}],
             },
             {
                 "role": "tool",
-                "tool_call_id": "checkup",
+                "tool_call_id": call_id,
                 "name": "propose_booking",
                 "result": output.result,
                 "card": output.card,

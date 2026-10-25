@@ -1,6 +1,6 @@
 """Request bodies. Responses are plain dicts built by the services."""
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, StrictInt
 
 
 class ReminderRequest(BaseModel):
@@ -12,7 +12,7 @@ class MessageRequest(BaseModel):
 
 
 class CheckInRequest(BaseModel):
-    scores: dict[str, int]
+    scores: dict[str, StrictInt]  # "3" or true are not answers
 
 
 class DoseRequest(BaseModel):

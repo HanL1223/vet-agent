@@ -70,6 +70,7 @@ class Plan:
     monthly_price: int
     benefits: list[str] = field(default_factory=list)
     covers: list[str] = field(default_factory=list)  # GapType values included in the plan
+    life_stage: str | None = None  # "young", "adult" or "senior"; None: any pet
 
 
 @dataclass(frozen=True)

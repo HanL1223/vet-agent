@@ -8,7 +8,13 @@ owner agent's proposal flow (AG-4).
 from datetime import date
 
 from vetagent.domain import checkins as ci
-from vetagent.domain.care_gaps import due_label, find_gaps, rank_by_value, upcoming_care
+from vetagent.domain.care_gaps import (
+    due_label,
+    find_gaps,
+    life_stage,
+    rank_by_value,
+    upcoming_care,
+)
 from vetagent.domain.cover import WINDOW_DAYS, Dose, cover
 from vetagent.domain.forecast import Forecast, forecast
 from vetagent.domain.models import Plan
@@ -89,7 +95,7 @@ class HomeService:
         history = [ci.CheckIn(w, s) for w, s in self._store.checkins(self._pet_id)]
         week = ci.iso_week(self._today)
         latest = history[-1] if history else None
-        trend = ci.trend(history)
+        trend = ci.trend(history, self._today)
         return {
             "questions": [
                 {"key": k, "question": q, "low": lo, "high": hi} for k, q, lo, hi in ci.QUESTIONS
@@ -99,10 +105,10 @@ class HomeService:
             "latest": latest.scores if latest else None,
             "max_total": ci.MAX_SCORE * len(ci.QUESTIONS),
             "history": [
-                {"week": c.week, "total": c.total, "mobility": c.scores["mobility"]}
-                for c in history[-8:]
+                {"week": w.week, "total": w.total, "low": w.low}
+                for w in ci.recent_weeks(history, self._today)
             ],
-            "trend": {"dropping": trend.dropping, "message": _trend_message(trend)},
+            "trend": {"dropping": trend.dropping, "message": ci.describe(trend)},
             "shared": self._store.consent(self._owner_id).share_log,
         }
 
@@ -141,7 +147,7 @@ class HomeService:
         return {
             "items": [
                 {
-                    "month": f"{i.due:%b}",
+                    "month": _month(i.due, self._today),
                     "title": i.title.removesuffix(" due"),
                     "price": i.price,
                     "overdue": i.overdue,
@@ -162,14 +168,16 @@ class HomeService:
         }
 
     def _plan_for_forecast(self, result: Forecast) -> tuple[Plan | None, bool]:
-        """The pet's own plan; otherwise the plan that would cost the least, to compare."""
+        """The pet's own plan; otherwise the cheapest plan meant for its life stage."""
         plans = {p.id: p for p in self._practice.plans()}
         membership = next(
             (m for m in self._practice.memberships() if m.pet_id == self._pet_id), None
         )
-        if membership:
+        if membership and membership.plan_id in plans:
             return plans[membership.plan_id], True
-        best = min(plans.values(), key=lambda p: result.on_plan(p).total, default=None)
+        stage = life_stage(self._practice.pet(self._pet_id), self._today)
+        eligible = [p for p in plans.values() if p.life_stage in (None, stage)]
+        best = min(eligible, key=lambda p: result.on_plan(p).total, default=None)
         return best, False
 
     def _weight(self) -> dict | None:
@@ -190,9 +198,6 @@ class HomeService:
         }
 
 
-def _trend_message(trend: ci.Trend) -> str | None:
-    if not trend.dropping:
-        return None
-    scores = " and ".join(str(v) for v in trend.recent)
-    what = "Mobility" if trend.measure == "mobility" else "Overall wellbeing"
-    return f"{what} has been lower for 2 weeks ({scores}, usually about {trend.baseline:g})."
+def _month(day: date, today: date) -> str:
+    """A 12-month horizon can hold the same month twice, so later years carry a year."""
+    return f"{day:%b}" if day.year == today.year else f"{day:%b} '{day:%y}"

@@ -17,17 +17,19 @@ const TILES = {
     const c = b.checkin;
     if (checkinOpen) return checkinForm(c);
     const bars = c.history.map((h, i) => {
+      if (h.total === null) return '<span class="missed" title="No check-in"></span>';
       const last = i === c.history.length - 1;
       const height = 8 + Math.round(48 * h.total / c.max_total);
-      return `<span class="${last ? "now" : h.mobility <= 2 ? "low" : ""}" style="height: ${height}px"></span>`;
+      return `<span class="${last ? "now" : h.low ? "low" : ""}" style="height: ${height}px"></span>`;
     }).join("");
-    const latest = c.history[c.history.length - 1];
+    const done = c.history.filter((h) => h.total !== null);
+    const latest = done[done.length - 1];
     return `
       ${c.trend.dropping
         ? `<p class="note clay">${esc(c.trend.message)}</p>`
         : `<p class="note">${latest ? "Steady. Thanks for keeping track." : "No check-ins yet."}</p>`}
-      <div class="weeks" role="img" aria-label="Weekly totals out of ${c.max_total}: ${esc(c.history.map((h) => h.total).join(", "))}">${bars}</div>
-      <div class="week-labels label"><span>8 weeks ago</span><span>${latest ? `Latest ${latest.total}/${c.max_total}` : ""}</span></div>
+      <div class="weeks" role="img" aria-label="Weekly totals out of ${c.max_total}: ${esc(c.history.map((h) => h.total ?? "missed").join(", "))}">${bars}</div>
+      <div class="week-labels label"><span>8 weeks ago</span><span>${latest ? `Latest ${latest.total}/${c.max_total}` : ""} · this week</span></div>
       <div class="actions">
         <button class="btn ${c.done_this_week ? "ghost" : ""}" data-open-checkin>${c.done_this_week ? "Update this week" : "Check in"}</button>
         ${c.trend.dropping ? '<button class="btn ghost" data-checkup>Ask for a check-up</button>' : ""}
@@ -54,7 +56,7 @@ const TILES = {
       <div class="cost-compare">
         <div class="${plan.member ? "mine" : ""}"><div class="label">${esc(plan.name)} plan</div>
           <div class="big-number">${money(plan.total)}</div>
-          <div class="muted small">${money(plan.fees)} fees${plan.extras ? ` + ${money(plan.extras)} extra` : ""}</div></div>
+          <div class="muted small">12 monthly fees${plan.extras ? ` + ${money(plan.extras)} not included` : ", all care included"}</div></div>
         <div class="${plan.member ? "" : "mine"}"><div class="label">Pay as you go</div>
           <div class="big-number">${money(f.pay_as_you_go)}</div>
           <div class="muted small">at the clinic's prices</div></div>

@@ -5,7 +5,8 @@
   "lead_vet_user_id": "12",
   "species": {
     "Canine": "dog",
-    "Feline": "cat"
+    "Feline": "cat",
+    "Avian": "bird"
   },
   "price_products": {
     "vaccination": "301",
@@ -68,5 +69,10 @@
       "parasite",
       "senior"
     ]
+  },
+  "plan_life_stage": {
+    "7": "young",
+    "8": "adult",
+    "9": "senior"
   }
 }

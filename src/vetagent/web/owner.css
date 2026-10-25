@@ -39,6 +39,7 @@ body { min-height: 100vh; min-height: 100dvh; display: flex; flex-direction: col
 .weeks span { flex: 1; border-radius: 3px 3px 0 0; background: var(--sunk); }
 .weeks span.low { background: var(--clay-tint); }
 .weeks span.now { background: var(--ink); }
+.weeks span.missed { height: 8px; background: none; border: 1px dashed var(--edge); }
 .week-labels { display: flex; justify-content: space-between; }
 .form-q { border: 0; padding: 0; margin: 0; display: grid; gap: 6px; }
 .form-q legend { padding: 0; font-weight: 700; font-size: 14px; }
@@ -62,7 +63,7 @@ body { min-height: 100vh; min-height: 100dvh; display: flex; flex-direction: col
 .cost-compare > div { border: 1px solid var(--rule); border-radius: 8px; padding: 10px 12px; }
 .cost-compare .mine { border-color: var(--ink); }
 .months { margin: 0; padding: 0; list-style: none; font-size: 14px; }
-.months li { display: grid; grid-template-columns: 44px 1fr auto; gap: 8px; padding: 5px 0; }
+.months li { display: grid; grid-template-columns: 64px 1fr auto; gap: 8px; padding: 5px 0; }
 .months li + li { border-top: 1px solid var(--rule); }
 
 .spark { width: 100%; height: 40px; display: block; }
@@ -100,7 +101,11 @@ body { min-height: 100vh; min-height: 100dvh; display: flex; flex-direction: col
 .trend { display: block; width: 100%; height: auto; margin-top: 8px; overflow: visible; }
 
 .composer { border-top: 1px solid var(--rule); padding: 10px 14px 12px; }
-.chips { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 10px; scrollbar-width: none; }
+.chips {
+  display: flex; gap: 6px; overflow-x: auto; padding-bottom: 10px; scrollbar-width: none;
+  /* Fade the edge so a cut-off chip reads as "scroll for more". */
+  mask-image: linear-gradient(to right, #000 85%, transparent);
+}
 .chips .chip { flex: 0 0 auto; }
 .send-row { display: flex; gap: 8px; }
 .send-row input {

@@ -1,10 +1,10 @@
 {
   "meta": {
     "timestamp": 1793066400,
-    "items_page_size": 9,
+    "items_page_size": 10,
     "items_page": 1,
     "items_page_total": 1,
-    "items_total": 9
+    "items_total": 10
   },
   "items": [
     {
@@ -68,6 +68,13 @@
         "id": "49",
         "name": "Staffordshire terrier",
         "species_id": "1"
+      }
+    },
+    {
+      "breed": {
+        "id": "49",
+        "name": "Cockatiel",
+        "species_id": "3"
       }
     }
   ]

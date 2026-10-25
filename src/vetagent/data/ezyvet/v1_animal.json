@@ -1,10 +1,10 @@
 {
   "meta": {
     "timestamp": 1793066400,
-    "items_page_size": 9,
+    "items_page_size": 10,
     "items_page": 1,
     "items_page_total": 1,
-    "items_total": 9
+    "items_total": 10
   },
   "items": [
     {
@@ -162,6 +162,23 @@
         "microchip_number": "956000012094410",
         "created_at": 1399082400,
         "modified_at": 1781748000
+      }
+    },
+    {
+      "animal": {
+        "id": "1210",
+        "active": true,
+        "name": "Mango",
+        "contact_id": "501",
+        "species_id": "3",
+        "breed_id": "49",
+        "sex_id": "4",
+        "date_of_birth": 1631412000,
+        "is_estimated_birth": true,
+        "is_dead": false,
+        "microchip_number": null,
+        "created_at": 1641776400,
+        "modified_at": 1777687200
       }
     }
   ]

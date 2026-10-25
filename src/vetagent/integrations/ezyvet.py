@@ -228,14 +228,18 @@ class EzyVetPracticeSystem:
                 monthly_price=round(float(p["price"])),
                 benefits=benefits.get(str(p["id"]), []),
                 covers=covers.get(str(p["id"]), []),
+                life_stage=self._config.get("plan_life_stage", {}).get(str(p["id"])),
             )
             for p in source.list("v2/wellnessplan")
             if p.get("active", True)
         ]
+        offered = {p.id for p in self._plans}
         active = [
             m
             for m in source.list("v2/wellnessplanmembership")
-            if m["status"] == "Active" and str(m["animal_id"]) in self._pets
+            if m["status"] == "Active"
+            and str(m["animal_id"]) in self._pets
+            and str(m["wellness_plan_id"]) in offered  # a retired plan isn't shown or billed
         ]
         self._memberships = [
             Membership(str(m["animal_id"]), str(m["wellness_plan_id"]), self._date(m["start_date"]))

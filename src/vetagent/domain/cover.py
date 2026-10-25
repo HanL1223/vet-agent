@@ -36,6 +36,8 @@ class Cover:
 def cover(doses: Iterable[Dose], today: date) -> list[Cover]:
     by_product: dict[str, list[Dose]] = {}
     for dose in doses:
+        if dose.given_on > today:  # a future-dated dose protects nothing yet
+            continue
         by_product.setdefault(dose.product, []).append(dose)
     return [_cover(product, ds, today) for product, ds in sorted(by_product.items())]
 
@@ -47,7 +49,7 @@ def _cover(product: str, doses: list[Dose], today: date) -> Cover:
         first = max(d.given_on, start)
         last = min(d.given_on + timedelta(days=d.lasts_days), today)
         covered.update(range((first - start).days, (last - start).days))
-    ends = [d.given_on + timedelta(days=d.lasts_days) for d in doses if d.given_on <= today]
+    ends = [d.given_on + timedelta(days=d.lasts_days) for d in doses]
     latest = max(doses, key=lambda d: (d.given_on, not d.owner_reported))
     return Cover(
         product=product,

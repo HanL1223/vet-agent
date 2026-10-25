@@ -92,7 +92,10 @@ def set_consent(request: Request, body: ConsentRequest) -> dict:
 
 @owner.post("/checkup")
 def checkup(request: Request) -> dict:
-    return _services(request).owner_agent.propose_checkup()
+    try:
+        return _services(request).owner_agent.propose_checkup()
+    except ProposalError as exc:
+        raise HTTPException(409, str(exc)) from exc
 
 
 @owner.post("/reset")

@@ -59,6 +59,15 @@ def find_gaps(
     return gaps
 
 
+def life_stage(pet: Pet, today: date) -> str:
+    """Young under 1, senior from the CG-3 senior age, adult in between."""
+    age = pet.age_on(today)
+    if age < 1:
+        return "young"
+    senior_age = SENIOR_AGE.get(pet.species)
+    return "senior" if senior_age is not None and age >= senior_age else "adult"
+
+
 def rank_by_value(gaps: Iterable[CareGap]) -> list[CareGap]:
     return sorted(gaps, key=lambda g: (-g.value, g.due_date))
 

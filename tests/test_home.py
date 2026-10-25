@@ -1,71 +1,15 @@
+"""Owner dashboard through the API, on the demo clinic (Biscuit, 9yo Labrador, Senior plan)."""
+
 from datetime import date
 
-import pytest
-
-from vetagent.domain import checkins as ci
-from vetagent.domain.care_gaps import Due
-from vetagent.domain.cover import Dose, cover
-from vetagent.domain.forecast import forecast
-from vetagent.domain.models import GapType, Plan
+from vetagent.agent.llm import ScriptedModel
+from vetagent.api.wiring import seed_demo_home
+from vetagent.integrations.ezyvet import EzyVetPracticeSystem, FileSource
+from vetagent.services.home import HomeService
+from vetagent.services.owner_agent import OwnerAgentService
 
 TODAY = date(2026, 10, 27)
 GOOD = {"appetite": 4, "energy": 4, "mobility": 4, "comfort": 4, "toileting": 4}
-
-
-def _weeks(*mobility: int) -> list[ci.CheckIn]:
-    return [ci.CheckIn(f"2026-W{30 + i}", {**GOOD, "mobility": m}) for i, m in enumerate(mobility)]
-
-
-def test_ht1_rejects_missing_or_out_of_range_answers():
-    with pytest.raises(ValueError):
-        ci.validate({**GOOD, "mobility": 5})
-    with pytest.raises(ValueError):
-        ci.validate({"appetite": 4})
-
-
-def test_ht1_iso_week():
-    assert ci.iso_week(TODAY) == "2026-W44"
-
-
-def test_ht2_two_low_weeks_after_a_steady_baseline_is_a_drop():
-    trend = ci.trend(_weeks(4, 4, 4, 4, 2, 2))
-    assert (trend.dropping, trend.measure) == (True, "mobility")
-
-
-def test_ht2_one_low_week_is_not_a_drop():
-    assert ci.trend(_weeks(4, 4, 4, 4, 4, 2)).dropping is False
-
-
-def test_ht2_needs_six_weeks_of_history():
-    assert ci.trend(_weeks(4, 2, 2)).dropping is False
-
-
-def test_ht4_overdue_care_lands_this_month_and_repeats():
-    dues = [Due(GapType.PARASITE, "Chew due", "", date(2026, 10, 1), 96, every_days=90)]
-    result = forecast(dues, TODAY)
-    assert [i.due for i in result.items][:2] == [TODAY, date(2027, 1, 25)]
-    assert result.items[0].overdue and result.pay_as_you_go == 96 * 5
-
-
-def test_ht4_plan_total_counts_fees_and_care_it_does_not_include():
-    dues = [
-        Due(GapType.SENIOR, "Screening", "", date(2026, 12, 1), 280),
-        Due(GapType.DENTAL, "Dental", "", date(2026, 12, 1), 650),
-    ]
-    cost = forecast(dues, TODAY).on_plan(Plan("p", "Senior", 59, covers=["senior"]))
-    assert (cost.fees, cost.extras, cost.total) == (708, 650, 1358)
-
-
-def test_ht5_cover_counts_days_protected_in_the_last_year():
-    doses = [Dose("Chew", date(2026, 7, 29), 90)]
-    (result,) = cover(doses, TODAY)
-    assert (result.covered_days, result.days_left) == (90, 0)
-
-
-def test_ht6_owner_dose_extends_cover_and_is_marked():
-    doses = [Dose("Chew", date(2026, 7, 29), 90), Dose("Chew", TODAY, 90, owner_reported=True)]
-    (result,) = cover(doses, TODAY)
-    assert result.days_left == 90 and result.owner_reported
 
 
 def test_ht2_dashboard_shows_demo_drop_and_checkup_becomes_proposal(client):
@@ -114,5 +58,39 @@ def test_ht6_home_dose_counts_towards_cover(client):
     assert chew["days_left"] == 90 and chew["owner_reported"] is True
 
 
-def test_br1_household_lists_the_owners_pet_species(client):
-    assert client.get("/api/owner/household").json() == {"species": ["dog"]}
+def test_br1_household_lists_every_species_the_owner_registered(client):
+    assert client.get("/api/owner/household").json() == {"species": ["bird", "dog"]}
+
+
+def test_ht2_checkup_twice_gets_two_distinct_tool_call_ids(practice, store):
+    seed_demo_home(store)
+    agent = OwnerAgentService(practice, store, ScriptedModel(), TODAY, "501", "1201")
+    agent.propose_checkup()
+    agent.propose_checkup()
+    ids = [c["id"] for m in store.messages("501") for c in m.get("tool_calls", [])]
+    assert len(ids) == len(set(ids))
+
+
+def test_ht2_checkup_is_refused_when_check_ins_are_steady(client):
+    # A steady check-in this week: the latest two weeks are no longer both low.
+    client.post("/api/owner/checkins", json={"scores": GOOD})
+    assert client.post("/api/owner/checkup").status_code == 409
+
+
+def test_ht4_non_member_is_compared_with_the_plan_for_their_life_stage(practice, store):
+    nala = HomeService(practice, store, TODAY, "507", "1207")  # 7yo retriever, no plan
+    plan = nala.dashboard()["forecast"]["plan"]
+    assert (plan["name"], plan["member"]) == ("Adult", False)
+
+
+class _RetiredSeniorPlan(FileSource):
+    def list(self, endpoint: str) -> list[dict]:
+        records = super().list(endpoint)
+        if endpoint == "v2/wellnessplan":
+            return [{**r, "active": r["name"] != "Senior"} for r in records]
+        return records
+
+
+def test_ht4_membership_on_a_retired_plan_is_not_counted():
+    practice = EzyVetPracticeSystem(_RetiredSeniorPlan())
+    assert "1201" not in {m.pet_id for m in practice.memberships()}

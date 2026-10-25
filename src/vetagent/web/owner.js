@@ -98,7 +98,6 @@ function render() {
   }
   const pet = convo.pet;
   document.getElementById("clinic").textContent = convo.clinic;
-  document.getElementById("input").placeholder = `Ask about ${pet.name}...`;
   document.getElementById("mode").textContent = convo.model;
   document.getElementById("chat").innerHTML = convo.items.map(renderItem).join("") +
     (busy ? `<div class="typing">Checking ${esc(pet.name)}'s records...</div>` : "");

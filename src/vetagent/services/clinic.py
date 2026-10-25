@@ -51,11 +51,14 @@ class ClinicService:
         """CL-2, CL-3."""
         members = {m.pet_id for m in self._practice.memberships()}
         reminded = self._store.reminded_keys()
+        notes: dict[str, str | None] = {}  # one trend per pet, however many gaps it has
         rows = []
         for gap in self.all_gaps():
             if gap_type and gap.type != GapType(gap_type):
                 continue
             pet = self._practice.pet(gap.pet_id)
+            if pet.id not in notes:
+                notes[pet.id] = self._home_note(pet.owner_id, pet.id)
             rows.append(
                 GapRow(
                     key=gap_key(gap),
@@ -71,7 +74,7 @@ class ClinicService:
                     overdue=gap.status is GapStatus.OVERDUE,
                     value=gap.value,
                     reminded=gap_key(gap) in reminded,
-                    home_note=self._home_note(pet.owner_id, pet.id),
+                    home_note=notes[pet.id],
                 )
             )
         return rows
@@ -80,10 +83,8 @@ class ClinicService:
         """HT-3: only when the owner shares their home log (PR-1)."""
         if not self._store.consent(owner_id).share_log:
             return None
-        trend = ci.trend([ci.CheckIn(w, s) for w, s in self._store.checkins(pet_id)])
-        if not trend.dropping:
-            return None
-        return f"Home check-ins: {'mobility' if trend.measure == 'mobility' else 'wellbeing'} down"
+        checkins = [ci.CheckIn(w, s) for w, s in self._store.checkins(pet_id)]
+        return ci.clinic_flag(ci.trend(checkins, self._today))
 
     def summary(self) -> dict:
         """CL-1."""
