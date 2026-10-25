@@ -14,13 +14,21 @@ Code docstrings and test names reference these IDs. Start there before changing 
 
 ## Commands
 
-```bash
-make install   # venv + deps + copies .env.example to .env
-make run       # http://localhost:8000 (uvicorn with reload)
-make test      # pytest
-make lint      # ruff check + format check
-make reset     # delete the local SQLite file (fresh demo)
+The project uses **uv** and is developed on **Windows** (PowerShell). Commands are the same on
+every OS; never add Makefiles, shell scripts or POSIX-only paths.
+
+```powershell
+uv sync                                  # Python 3.12 + deps (dev group included)
+uv run vetagent                          # http://localhost:8000; creates .env on first run
+uv run vetagent --reload                 # auto-reload while coding
+uv run vetagent --reset                  # delete the SQLite file, then start (fresh demo)
+uv run pytest                            # tests
+uv run ruff check src tests              # lint
+uv run ruff format src tests             # format
+uv add <package> / uv add --dev <pkg>    # dependencies (updates uv.lock; commit it)
 ```
+
+Use `pathlib` for paths and avoid `%-d`-style strftime codes (not supported on Windows).
 
 No API key needed: with `ANTHROPIC_API_KEY` empty the agent uses `ScriptedModel` (offline).
 Set the key in `.env` to use Claude through the same loop and tools.

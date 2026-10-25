@@ -14,25 +14,29 @@ Add an Anthropic API key to use Claude.
 
 ## Run it
 
-Requires Python 3.11+.
-
-```bash
-make install
-make run
-```
-
-Open http://localhost:8000.
-
-On Windows (PowerShell), without `make`:
+Requires [uv](https://docs.astral.sh/uv/). On Windows (PowerShell):
 
 ```powershell
-py -m venv .venv
-.venv\Scripts\pip install -e ".[dev]"
-copy .env.example .env
-.venv\Scripts\uvicorn vetagent.api.app:create_app --factory --reload --port 8000 --env-file .env
+powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
 ```
 
-To use Claude, set `ANTHROPIC_API_KEY` in `.env` and restart.
+Then, the same on Windows, macOS and Linux:
+
+```powershell
+uv sync                 # installs Python 3.12 if needed, plus all dependencies
+uv run vetagent         # http://localhost:8000
+```
+
+The first run creates `.env` from `.env.example`. To use Claude, set `ANTHROPIC_API_KEY` in
+`.env` and restart.
+
+| Task | Command |
+| --- | --- |
+| Run the demo | `uv run vetagent` |
+| Run with auto-reload while coding | `uv run vetagent --reload` |
+| Wipe demo state and run | `uv run vetagent --reset` |
+| Tests | `uv run pytest` |
+| Lint and format check | `uv run ruff check src tests` and `uv run ruff format --check src tests` |
 
 ## Five-minute walkthrough
 
@@ -46,7 +50,7 @@ To use Claude, set `ANTHROPIC_API_KEY` in `.env` and restart.
 7. Tap *Log weight 31.2 kg*. Open **Data** (shield icon), turn sharing off, log again.
 8. Back in the clinic dashboard, open **Requests** to see what Priya sent.
 
-*Start over* (under the chat) resets the conversation; `make reset` wipes all demo state.
+*Start over* (under the chat) resets the conversation; `uv run vetagent --reset` wipes all demo state.
 
 ## Project layout
 
