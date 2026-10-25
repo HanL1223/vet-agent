@@ -27,7 +27,14 @@ CREATE TABLE IF NOT EXISTS clinic_requests (
     pet_id TEXT NOT NULL,
     kind TEXT NOT NULL,
     detail TEXT NOT NULL,
-    created_at TEXT NOT NULL
+    created_at TEXT NOT NULL,
+    ref TEXT NOT NULL DEFAULT ''
+);
+CREATE TABLE IF NOT EXISTS estimate_releases (
+    estimate_id TEXT PRIMARY KEY,
+    pet_id TEXT NOT NULL,
+    explanations TEXT NOT NULL,
+    released_at TEXT NOT NULL
 );
 CREATE TABLE IF NOT EXISTS weight_logs (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -53,11 +60,24 @@ CREATE TABLE IF NOT EXISTS checkins (
     created_at TEXT NOT NULL,
     PRIMARY KEY (pet_id, week)
 );
-CREATE TABLE IF NOT EXISTS owner_doses (
+CREATE TABLE IF NOT EXISTS recaps (
+    id TEXT PRIMARY KEY,
+    pet_id TEXT NOT NULL,
+    payload TEXT NOT NULL,
+    released_at TEXT NOT NULL
+);
+CREATE TABLE IF NOT EXISTS ticks (
+    pet_id TEXT NOT NULL,
+    item TEXT NOT NULL,
+    ticked_at TEXT NOT NULL,
+    PRIMARY KEY (pet_id, item)
+);
+CREATE TABLE IF NOT EXISTS triage_log (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     pet_id TEXT NOT NULL,
-    product TEXT NOT NULL,
-    given_on TEXT NOT NULL,
+    symptom TEXT NOT NULL,
+    hours INTEGER NOT NULL,
+    level TEXT NOT NULL,
     created_at TEXT NOT NULL
 );
 """
@@ -87,6 +107,7 @@ class Store:
         self._db = sqlite3.connect(path, check_same_thread=False)
         self._db.row_factory = sqlite3.Row
         self._db.executescript(SCHEMA)
+        self._add_missing_columns()
 
     # Conversation -----------------------------------------------------------
     def append_message(self, owner_id: str, message: dict[str, Any]) -> None:
@@ -101,9 +122,14 @@ class Store:
         ).fetchall()
         return [json.loads(r["payload"]) for r in rows]
 
-    def clear_conversation(self, owner_id: str) -> None:
-        self._exec("DELETE FROM messages WHERE owner_id = ?", (owner_id,))
-        self._exec("DELETE FROM proposals WHERE owner_id = ?", (owner_id,))
+    def clear_conversation(self, conversation: str, owner_id: str, pet_id: str) -> None:
+        """Drop one pet's chat and its unsent proposals; sent requests stay with the clinic."""
+        self._exec("DELETE FROM messages WHERE owner_id = ?", (conversation,))
+        self._exec(
+            "DELETE FROM proposals WHERE owner_id = ? AND status = 'pending'"
+            " AND json_extract(payload, '$.pet_id') = ?",
+            (owner_id, pet_id),
+        )
 
     # Proposals (AG-4) ---------------------------------------------------------
     def create_proposal(self, owner_id: str, kind: str, payload: dict[str, Any]) -> Proposal:
@@ -127,10 +153,12 @@ class Store:
         self._exec("UPDATE proposals SET status = ? WHERE id = ?", (status, proposal_id))
 
     # Requests sent to the clinic ---------------------------------------------
-    def add_clinic_request(self, pet_id: str, kind: str, detail: str) -> None:
+    def add_clinic_request(self, pet_id: str, kind: str, detail: str, ref: str = "") -> None:
+        """`ref` links a request to what it answers, e.g. the estimate an owner replied to."""
         self._exec(
-            "INSERT INTO clinic_requests (pet_id, kind, detail, created_at) VALUES (?, ?, ?, ?)",
-            (pet_id, kind, detail, _now()),
+            "INSERT INTO clinic_requests (pet_id, kind, detail, created_at, ref)"
+            " VALUES (?, ?, ?, ?, ?)",
+            (pet_id, kind, detail, _now(), ref),
         )
 
     def clinic_requests(self) -> list[dict[str, Any]]:
@@ -195,18 +223,82 @@ class Store:
         ).fetchall()
         return [(r["week"], json.loads(r["scores"])) for r in rows]
 
-    # Doses the owner gave at home (HT-6); never written back to the clinic -------
-    def log_dose(self, pet_id: str, product: str, given_on: str) -> None:
+    # Visit recaps the clinic released to the owner (VR-1) -----------------------
+    def release_recap(self, recap_id: str, pet_id: str, recap: dict[str, Any]) -> None:
         self._exec(
-            "INSERT INTO owner_doses (pet_id, product, given_on, created_at) VALUES (?, ?, ?, ?)",
-            (pet_id, product, given_on, _now()),
+            "INSERT OR REPLACE INTO recaps (id, pet_id, payload, released_at) VALUES (?, ?, ?, ?)",
+            (recap_id, pet_id, json.dumps(recap), _now()),
         )
 
-    def owner_doses(self, pet_id: str) -> list[tuple[str, str]]:
+    def recaps(self, pet_id: str) -> list[dict[str, Any]]:
         rows = self._db.execute(
-            "SELECT product, given_on FROM owner_doses WHERE pet_id = ? ORDER BY id", (pet_id,)
+            "SELECT payload FROM recaps WHERE pet_id = ? ORDER BY released_at", (pet_id,)
         ).fetchall()
-        return [(r["product"], r["given_on"]) for r in rows]
+        return [json.loads(r["payload"]) for r in rows]
+
+    def all_recaps(self) -> list[dict[str, Any]]:
+        """Every released recap, newest first, for the clinic's list (CL-8)."""
+        rows = self._db.execute(
+            "SELECT pet_id, payload, released_at FROM recaps ORDER BY released_at DESC, rowid DESC"
+        ).fetchall()
+        return [
+            {**json.loads(r["payload"]), "pet_id": r["pet_id"], "released_at": r["released_at"]}
+            for r in rows
+        ]
+
+    # Estimates the clinic sent to the owner (CL-7) -------------------------------
+    def release_estimate(self, estimate_id: str, pet_id: str, explanations: dict[str, str]) -> None:
+        self._exec(
+            "INSERT OR REPLACE INTO estimate_releases"
+            " (estimate_id, pet_id, explanations, released_at) VALUES (?, ?, ?, ?)",
+            (estimate_id, pet_id, json.dumps(explanations), _now()),
+        )
+
+    def estimate_releases(self) -> dict[str, dict[str, Any]]:
+        rows = self._db.execute("SELECT * FROM estimate_releases").fetchall()
+        return {
+            r["estimate_id"]: {
+                "pet_id": r["pet_id"],
+                "explanations": json.loads(r["explanations"]),
+                "released_at": r["released_at"],
+            }
+            for r in rows
+        }
+
+    # Things the owner ticked off: recap instructions (VR-2), new-pet steps (NP-1) ---
+    def set_tick(self, pet_id: str, item: str, done: bool) -> None:
+        if done:
+            self._exec(
+                "INSERT OR IGNORE INTO ticks (pet_id, item, ticked_at) VALUES (?, ?, ?)",
+                (pet_id, item, _now()),
+            )
+        else:
+            self._exec("DELETE FROM ticks WHERE pet_id = ? AND item = ?", (pet_id, item))
+
+    def ticks(self, pet_id: str) -> set[str]:
+        rows = self._db.execute("SELECT item FROM ticks WHERE pet_id = ?", (pet_id,))
+        return {r["item"] for r in rows}
+
+    # "Should I come in?" answers, kept for clinic insight (TR-5) -------------------
+    def log_triage(self, pet_id: str, symptom: str, hours: int, level: str) -> None:
+        self._exec(
+            "INSERT INTO triage_log (pet_id, symptom, hours, level, created_at)"
+            " VALUES (?, ?, ?, ?, ?)",
+            (pet_id, symptom, hours, level, _now()),
+        )
+
+    def triage_log(self, pet_id: str) -> list[dict[str, Any]]:
+        rows = self._db.execute(
+            "SELECT symptom, hours, level FROM triage_log WHERE pet_id = ? ORDER BY id",
+            (pet_id,),
+        ).fetchall()
+        return [dict(r) for r in rows]
+
+    def _add_missing_columns(self) -> None:
+        # Databases created before `ref` existed get it added; new ones already have it.
+        columns = {r["name"] for r in self._db.execute("PRAGMA table_info(clinic_requests)")}
+        if "ref" not in columns:
+            self._exec("ALTER TABLE clinic_requests ADD COLUMN ref TEXT NOT NULL DEFAULT ''", ())
 
     def _exec(self, sql: str, params: tuple) -> None:
         with self._db:

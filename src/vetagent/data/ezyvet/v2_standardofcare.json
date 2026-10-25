@@ -1,10 +1,10 @@
 {
   "meta": {
     "timestamp": 1793066400,
-    "items_page_size": 17,
+    "items_page_size": 18,
     "items_page": 1,
     "items_page_total": 1,
-    "items_total": 17
+    "items_total": 18
   },
   "items": [
     {
@@ -242,6 +242,20 @@
         },
         "last_fulfilled_at": 1789696800,
         "due_at": 1797469200,
+        "modified_at": 1793066400
+      }
+    },
+    {
+      "standardofcare": {
+        "id": "7018",
+        "animal_id": "1211",
+        "animal_uid": "A-1211",
+        "soc_group": {
+          "id": "24",
+          "name": "F3 Vaccination"
+        },
+        "last_fulfilled_at": 1792026000,
+        "due_at": 1794445200,
         "modified_at": 1793066400
       }
     }

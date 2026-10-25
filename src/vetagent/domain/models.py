@@ -71,6 +71,7 @@ class Plan:
     benefits: list[str] = field(default_factory=list)
     covers: list[str] = field(default_factory=list)  # GapType values included in the plan
     life_stage: str | None = None  # "young", "adult" or "senior"; None: any pet
+    species: list[str] = field(default_factory=list)  # empty: any species
 
 
 @dataclass(frozen=True)
@@ -89,7 +90,7 @@ class BenefitUse:
 
 
 @dataclass(frozen=True)
-class ParasiteProduct:
-    label: str  # matches CareEvent.detail for parasite events
-    lasts_days: int
-    owner_given: bool  # a chew or tablet the owner gives at home, not an injection
+class ClinicContact:
+    phone: str
+    emergency_name: str  # the after-hours partner the clinic sends owners to
+    emergency_phone: str

@@ -3,7 +3,7 @@ from datetime import date
 from vetagent.agent.llm import ModelReply, ScriptedModel, ToolCall, to_anthropic, to_openai
 from vetagent.agent.loop import MAX_STEPS, run_turn
 from vetagent.agent.safety import triage
-from vetagent.api.wiring import DEMO_OWNER_ID, DEMO_PET_ID
+from vetagent.api.wiring import DEMO_OWNER_ID
 from vetagent.domain.plan_value import months_paid
 from vetagent.store.sqlite import Consent
 
@@ -43,7 +43,7 @@ def test_ag4_booking_is_only_a_proposal(ctx, store):
 def test_ag5_weight_respects_sharing_consent(ctx, store):
     store.set_consent(DEMO_OWNER_ID, Consent(share_log=False, deidentified_use=False))
     run_turn(ScriptedModel(), "", [], "Log weight 31.2 kg", ctx)
-    assert store.weights(DEMO_PET_ID)[-1]["shared_with_clinic"] == 0
+    assert store.weights("1201")[-1]["shared_with_clinic"] == 0
 
 
 def test_ag6_plan_value_matches_seed(ctx):

@@ -70,7 +70,7 @@ async function loadPlans() {
 
 async function loadRequests() {
   const reqs = await api("/api/clinic/requests");
-  const label = { booking_request: "Booking request", vet_note: "Note for the vet" };
+  const label = { booking_request: "Booking request", vet_note: "Note for the vet", estimate_reply: "Reply to an estimate" };
   document.getElementById("requests").innerHTML = reqs.map((r) => `
     <div class="row req">
       <div><b>${esc(r.pet)}</b><div class="muted small">${esc(label[r.kind] || r.kind)}</div></div>
@@ -89,9 +89,11 @@ function showTab(name) {
   for (const tab of document.querySelectorAll("[data-tab]")) {
     tab.setAttribute("aria-selected", String(tab.dataset.tab === name));
   }
-  for (const id of ["gaps", "plans", "requests"]) {
+  for (const id of ["gaps", "estimates", "recaps", "plans", "requests"]) {
     document.getElementById("tab-" + id).hidden = id !== name;
   }
+  if (name === "estimates") loadEstimates(); // clinic-care.js
+  if (name === "recaps") loadRecaps(); // clinic-care.js
   if (name === "plans") loadPlans();
   if (name === "requests") loadRequests();
 }

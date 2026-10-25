@@ -35,11 +35,12 @@ function petIcon(species) {
 }
 
 // BR-1: the mark is one of the owner's own pets, picked at random when there are several.
-async function paintMark(selector) {
-  let species = ["dog"];
-  try {
-    species = (await api("/api/owner/household")).species;
-  } catch { /* keep the default mark */ }
+async function paintMark(selector, species) {
+  if (!species) {
+    try {
+      species = (await api("/api/owner/pets")).map((p) => p.species);
+    } catch { species = []; /* keep the default mark */ }
+  }
   const pick = species[Math.floor(Math.random() * species.length)] || "dog";
   for (const el of document.querySelectorAll(selector)) el.innerHTML = petIcon(pick);
 }

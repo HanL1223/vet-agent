@@ -18,10 +18,13 @@ real adapter must handle, and how to get API access.
 | Timestamps as epoch seconds | Confirmed | Standard of Care guide, contact `date_of_birth` |
 | Wellness membership `status` values (Active, Paused, Cancelled, ...) | Confirmed | Membership status help page |
 | Health status `weight` + `created_at`; consult `date` + `description`; product `price`; wellness plan `price`; membership `start_date`; invoice line `total` + `wellness_plan_membership_id` | **Assumed** | Field names not published. Check them against the Postman collection and fix the mapping in `integrations/ezyvet.py` |
+| Estimates (`v1/estimate`): `animal_id`, `user_id`, `name`, `status`, `created_at`, `expires_at`, and `items` with `product_id`, `name`, `low`, `high`, `is_optional` | **Assumed** | The endpoint and its fields aren't confirmed. The owner app's Costs section (CO-1) depends on it. If ezyVet doesn't expose estimates, publish them from our clinic dashboard or take them from a CSV export in pilots. |
+| Invoice line `product_id` (parasite dispensing history) | **Assumed** | Used to add dispensing dates to care history. |
 
 `clinic_config.json` is not ezyVet data. It holds what each clinic confirms at onboarding: its
-timezone, lead vet, which product prices each care type, which standard-of-care groups are which
-care type, and what each wellness plan covers. Dates are read in the clinic's timezone. The demo
+timezone, lead vet, phone and after-hours partner, ways to pay, which product prices each care
+type, which standard-of-care groups are which care type, owner-friendly explanations of estimate
+lines, and what each wellness plan covers and who it's for. Dates are read in the clinic's timezone. The demo
 includes one deceased patient (Max) and one cancelled membership to check they're ignored (CL-6).
 
 Sources are ezyVet's public developer and help pages, checked October 2026. Each mapping row is

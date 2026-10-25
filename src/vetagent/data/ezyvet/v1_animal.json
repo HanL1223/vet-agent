@@ -1,10 +1,10 @@
 {
   "meta": {
     "timestamp": 1793066400,
-    "items_page_size": 10,
+    "items_page_size": 11,
     "items_page": 1,
     "items_page_total": 1,
-    "items_total": 10
+    "items_total": 11
   },
   "items": [
     {
@@ -179,6 +179,23 @@
         "microchip_number": null,
         "created_at": 1641776400,
         "modified_at": 1777687200
+      }
+    },
+    {
+      "animal": {
+        "id": "1211",
+        "active": true,
+        "name": "Pip",
+        "contact_id": "501",
+        "species_id": "2",
+        "breed_id": "42",
+        "sex_id": "4",
+        "date_of_birth": 1787191200,
+        "is_estimated_birth": true,
+        "is_dead": false,
+        "microchip_number": null,
+        "created_at": 1792026000,
+        "modified_at": 1792026000
       }
     }
   ]

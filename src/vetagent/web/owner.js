@@ -1,16 +1,21 @@
 // Owner app, Ask panel: renders the conversation the API returns. No agent logic lives here.
-// dashboard.js renders the tiles; both share `api`, `send` and `showView`.
+// dashboard.js renders the tiles and picks the pet; both share `petId`, `forPet`, `run`,
+// `send` and `showView`.
 
 const CHIPS = [
   "What's due?",
-  "Is my plan worth it?",
-  "Book his screening",
-  "He's limping again",
-  "He's holding his leg up",
+  "Is the plan worth it?",
+  "Book a check-up",
+  "Limping again",
+  "Holding a leg up",
   "Log weight 31.2 kg",
 ];
+let petId = new URLSearchParams(location.search).get("pet");
 let convo = null;
 let busy = false;
+
+// Every owner call names the pet it is about (OW-1).
+const forPet = (path) => `${path}${path.includes("?") ? "&" : "?"}pet=${encodeURIComponent(petId)}`;
 
 // --- Cards: one renderer per card type the tools return ------------------------
 const CARDS = {
@@ -119,7 +124,7 @@ async function run(request) {
   } finally {
     busy = false;
     render();
-    // Chat actions (a logged weight, a consent change) can change the tiles.
+    // Chat actions (a consent change, a sent request) can change the tiles.
     document.dispatchEvent(new Event("conversation-changed"));
   }
 }
@@ -129,7 +134,7 @@ function setError(text) {
 }
 
 function send(text) {
-  run(() => api("/api/owner/messages", { method: "POST", body: { text } }));
+  run(() => api(forPet("/api/owner/messages"), { method: "POST", body: { text } }));
 }
 
 // Phones show one view at a time; on wide screens both are always visible.
@@ -144,7 +149,7 @@ function showView(name) {
 
 function setConsent(change) {
   const body = { ...convo.consent, ...change };
-  run(() => api("/api/owner/consent", { method: "PUT", body }));
+  run(() => api(forPet("/api/owner/consent"), { method: "PUT", body }));
 }
 
 // --- Events ------------------------------------------------------------------
@@ -168,11 +173,13 @@ document.addEventListener("click", (event) => {
   if (el.dataset.chip) send(el.dataset.chip);
   if (el.dataset.confirm) run(() => api(`/api/owner/proposals/${el.dataset.confirm}/confirm`, { method: "POST" }));
   if (el.dataset.dismiss) run(() => api(`/api/owner/proposals/${el.dataset.dismiss}/dismiss`, { method: "POST" }));
-  if (el.id === "reset") run(() => api("/api/owner/reset", { method: "POST" }));
+  if (el.id === "reset") run(() => api(forPet("/api/owner/reset"), { method: "POST" }));
   if (el.id === "open-data") document.getElementById("sheet").hidden = false;
   if (el.id === "close-data") document.getElementById("sheet").hidden = true;
   if (el.id === "share-log") setConsent({ share_log: !convo.consent.share_log });
   if (el.id === "deidentified") setConsent({ deidentified_use: !convo.consent.deidentified_use });
 });
 
-run(() => api("/api/owner/conversation"));
+function loadConversation() {
+  return run(() => api(forPet("/api/owner/conversation")));
+}

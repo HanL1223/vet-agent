@@ -13,11 +13,10 @@ from vetagent.services.home import HomeService
 from vetagent.services.owner_agent import OwnerAgentService
 from vetagent.store.sqlite import Store
 
-# The demo signs in as one owner with one pet. Real auth replaces these.
+# The demo signs in as one owner (Priya: Biscuit, Mango and Pip). Real auth replaces this.
 # ezyVet contact and animal IDs from data/ezyvet/.
 DEMO_OWNER_ID = "501"
-DEMO_PET_ID = "1201"
-# App-owned demo history (weekly check-ins) so the dashboard has weeks to show.
+# App-owned demo data (check-ins, a released recap, a sent estimate) so the app has a story.
 DEMO_HOME = Path(__file__).resolve().parent.parent / "data" / "demo_home.json"
 
 
@@ -39,19 +38,26 @@ def build_services(
     model = model or choose_model(settings)
     return Services(
         clinic=ClinicService(practice, store, settings.today),
-        owner_agent=OwnerAgentService(
-            practice, store, model, settings.today, DEMO_OWNER_ID, DEMO_PET_ID
-        ),
-        home=HomeService(practice, store, settings.today, DEMO_OWNER_ID, DEMO_PET_ID),
+        owner_agent=OwnerAgentService(practice, store, model, settings.today, DEMO_OWNER_ID),
+        home=HomeService(practice, store, settings.today, DEMO_OWNER_ID),
     )
 
 
 def seed_demo_home(store: Store, path: Path = DEMO_HOME) -> None:
-    """Load demo check-ins once; a pet that already has check-ins is left alone."""
-    for pet_id, weeks in json.loads(path.read_text(encoding="utf-8")).items():
+    """Load demo app data once; a pet that already has its own data is left alone."""
+    demo = json.loads(path.read_text(encoding="utf-8"))
+    for pet_id, weeks in demo["checkins"].items():
         if not store.checkins(pet_id):
             for week in weeks:
                 store.save_checkin(pet_id, week["week"], week["scores"])
+    for pet_id, recaps in demo["recaps"].items():
+        if not store.recaps(pet_id):
+            for recap in recaps:
+                store.release_recap(recap["id"], pet_id, recap)
+    released = store.estimate_releases()
+    for estimate_id, sent in demo["estimate_releases"].items():
+        if estimate_id not in released:
+            store.release_estimate(estimate_id, sent["pet_id"], sent["explanations"])
 
 
 def choose_model(settings: Settings) -> Model:

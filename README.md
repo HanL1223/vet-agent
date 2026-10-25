@@ -3,18 +3,22 @@
 Demo of a vet care-plan platform for independent clinics on ezyVet:
 
 - **Clinic dashboard**: a care-gap radar that ranks overdue care by value, one-click reminders,
-  care plans, and requests that owners sent from the agent.
-- **Owner pet dashboard**: a page per pet, branded as the clinic. Tiles show what needs attention,
-  a 30-second weekly check-in with its 8-week trend, parasite cover over the last 12 months, the
-  next 12 months of care priced with and without the plan, and weight. A dropping check-in trend
-  offers "Ask for a check-up", and the clinic sees it when the owner shares their log.
+  estimates to check and send to owners, visit recaps to write and release, care plans, and
+  requests that owners sent from the app.
+- **Owner app**: a page per pet, branded as the clinic, built around the moments owners get stuck:
+  - **Costs:** the clinic's estimates in plain language, with what the plan includes and the year
+    ahead.
+  - **Last visit:** the recap, instructions to tick off, results, and the follow-up.
+  - **Something not right?:** call now, see a vet within 24 hours, or keep an eye on it.
+  - **First 90 days:** for new puppies and kittens.
+  - **Weekly check-in:** for senior pets.
 - **Care assistant** (beside the dashboard): raises what's due, checks plan value honestly, logs
   weights with consent, drafts notes for the vet, and prepares bookings. Anything that contacts
   the clinic waits for the owner to confirm. Urgent symptoms skip the model and tell the owner to
   call the clinic now.
 
 `docs/business-model.md` explains the business: who pays, the pain points, and the data it
-builds.
+builds. `docs/owner-pain-points.md` has the ranked research behind the owner app.
 
 Runs offline with no API key (a scripted model drives the same agent loop and tools).
 Add an Anthropic API key to use Claude.
@@ -47,27 +51,38 @@ The first run creates `.env` from `.env.example`. To use Claude, set `ANTHROPIC_
 
 ## Five-minute walkthrough
 
-1. **Clinic dashboard** (`/clinic`): 8 care gaps worth $1,802, ranked by value. Biscuit carries
-   a "Home check-ins: mobility down" tag from Priya's weekly check-ins.
-2. **Owner dashboard** (`/owner`): the mark at the top left is one of Priya's pets (Biscuit or
-   Mango, her cockatiel), picked at random on each visit. Biscuit's check-in tile says mobility has
-   been lower for two weeks. Tap **Ask for a check-up**, then **Send to clinic**. Nothing is sent before that tap.
-3. **Next 12 months of care**: $944 pay-as-you-go against $708 on his Senior plan.
-4. **Parasite cover**: 85% of the last year for flea and tick, with two gaps. Tap **Given today**.
-5. Do this week's check-in (**Update this week** if you've already done one).
-6. In **Ask**: *He's limping again* drafts a note for Dr Lee (no diagnosis); *He's holding his
-   leg up* takes the urgent path with no model involved; *Log weight 31.2 kg* updates the tile.
-7. Open **Data** (shield icon) and turn sharing off: the clinic's tag disappears.
-8. Back in the clinic dashboard, open **Requests** to see what Priya sent.
+The demo signs in as Priya, who has three pets: Biscuit (9-year-old Labrador, Senior plan),
+Mango (cockatiel) and Pip (9-week-old kitten).
 
-*Start over* (under the chat) resets the conversation; `uv run vetagent --reset` wipes all demo
-state, including check-ins.
+1. **Clinic dashboard** (`/clinic`): 8 care gaps worth $1,802, ranked by value. Biscuit carries
+   a "Home check-ins: mobility down" tag.
+2. **Owner app** (`/owner`), **Biscuit, Costs**: Dr Lee's estimate from Thursday's recheck, line by
+   line. The screening is included in his plan, so the recommended part is $92. Tick *Hip
+   X-rays*, tap **Go ahead**, then **Send to clinic** in Ask. Nothing is sent before that tap.
+3. **Last visit**: tick off "lead walks only" (day 6 of 14), read the urine result in Dr Lee's
+   words, and tap **Book it** for the recheck.
+4. **Something not right?** Choose *Vomiting*, *1 to 3 days*, eating yes, bright yes: "See a vet
+   within 24 hours" and a request for tomorrow's first slot. Try *Wobbly back legs (paralysis
+   tick)*: "Call now", with the clinic's and the emergency vet's numbers.
+5. **Pip**: First 90 days. Vaccination 2 from 12 Nov, home steps to tick, this week's tip, and the
+   Puppy and Kitten plan (with an honest year-ahead comparison under Costs).
+6. **Mango**: birds are asked to call the clinic rather than use the checker.
+7. **Biscuit, Weekly check-in**: mobility lower for two weeks. Do this week's check-in, or tap **Ask
+   for a check-up**. In **Data** (shield icon), turn sharing off and the clinic's tag disappears.
+8. Back in the clinic dashboard, open **Requests** to see what Priya sent, and **Estimates** to see
+   that she replied. Edit a line's wording and send again: her Costs section updates.
+9. **Visit recaps**: write one for Pip (patient, summary, an instruction with days, a result) and
+   release it. It appears under Last visit in Priya's app.
+
+The mark at the top left is one of Priya's pets, picked at random on each visit. *Start over*
+resets the current pet's conversation; `uv run vetagent --reset` wipes all demo state.
 
 ## Project layout
 
 ```
 src/vetagent/
-  domain/        pure rules: care gaps, plan value, check-in trend, cover, cost forecast
+  domain/        pure rules: care gaps, plan value, estimates, recaps, triage, new-pet
+                 pathway, check-in trend, cost forecast
   integrations/  PracticeSystem port + ezyVet adapter (mapping: docs/ezyvet.md)
   store/         SQLite for app-owned data
   agent/         loop, tools, safety gate, prompts, model adapters
@@ -75,7 +90,7 @@ src/vetagent/
   api/           FastAPI routes and wiring
   web/           static pages (no framework, no build step)
   data/ezyvet/   demo clinic as saved ezyVet API responses (fictional)
-  data/demo_home.json   demo app-owned history (8 weeks of check-ins)
+  data/demo_home.json   demo app-owned data (8 weeks of check-ins, a released visit recap)
 docs/requirements.md   requirement IDs referenced by code and tests
 tests/                 pytest
 ```

@@ -1,12 +1,14 @@
-"""Pure rules behind the owner dashboard: check-in trend, cover and the cost forecast."""
+"""Pure rules behind the owner app: check-ins, forecast, estimates, triage, pathway, recaps."""
 
 from datetime import date, timedelta
 
 import pytest
 
 from vetagent.domain import checkins as ci
+from vetagent.domain import pathway, recaps
+from vetagent.domain import triage as tr
 from vetagent.domain.care_gaps import Due, life_stage
-from vetagent.domain.cover import Dose, cover
+from vetagent.domain.estimates import Estimate, EstimateLine, open_estimates, owner_price
 from vetagent.domain.forecast import forecast
 from vetagent.domain.models import GapType, Pet, Plan
 
@@ -90,23 +92,99 @@ def test_ht4_life_stage_picks_which_plans_a_pet_can_join():
     assert life_stage(pet, date(2027, 1, 2)) == "senior"
 
 
-def test_ht5_cover_counts_days_protected_in_the_last_year():
-    (result,) = cover([Dose("Chew", date(2026, 7, 29), 90)], TODAY)
-    assert (result.covered_days, result.days_left) == (90, 0)
+def _estimate(expires: date = date(2026, 11, 21)) -> Estimate:
+    return Estimate(
+        "e1",
+        "p",
+        "Screen",
+        "Dr Lee",
+        date(2026, 10, 22),
+        expires,
+        [
+            EstimateLine("Consult", "", 92, 92, False, None),
+            EstimateLine("Bloods", "", 280, 280, False, "senior"),
+            EstimateLine("X-rays", "", 420, 560, True, None),
+        ],
+    )
 
 
-def test_ht5_dose_before_the_window_only_counts_its_overlap():
-    (result,) = cover([Dose("Shot", date(2025, 6, 1), 365)], TODAY)
-    assert result.covered_days == (date(2026, 6, 1) - (TODAY - timedelta(days=365))).days
+def test_co2_plan_included_lines_drop_out_of_what_the_owner_pays():
+    price = owner_price(_estimate(), Plan("p", "Senior", 59, covers=["senior"]))
+    assert (price.recommended.low, price.with_optional.high, price.included) == (92, 652, 280)
 
 
-def test_ht6_owner_dose_extends_cover_and_is_marked():
-    doses = [Dose("Chew", date(2026, 7, 29), 90), Dose("Chew", TODAY, 90, owner_reported=True)]
-    (result,) = cover(doses, TODAY)
-    assert result.days_left == 90 and result.owner_reported
+def test_co2_without_a_plan_everything_is_payable():
+    price = owner_price(_estimate(), None)
+    assert (price.recommended.low, price.with_optional.low, price.included) == (372, 792, 0)
 
 
-def test_ht6_future_dated_dose_is_ignored():
-    doses = [Dose("Chew", date(2026, 7, 29), 90), Dose("Chew", date(2026, 12, 1), 90, True)]
-    (result,) = cover(doses, TODAY)
-    assert result.last_given == date(2026, 7, 29) and not result.owner_reported
+def test_co1_expired_estimates_are_not_open():
+    assert open_estimates([_estimate(expires=date(2026, 10, 1))], TODAY) == []
+
+
+def test_tr2_every_red_flag_calls_now_whatever_else_is_true():
+    for symptom in (s for s in tr.SYMPTOMS if s.red_flag):
+        assert tr.route(symptom.key, 3, True, True).level is tr.Level.CALL_NOW
+
+
+def test_tr1_not_bright_and_not_eating_calls_now():
+    assert tr.route("skin", 3, eating_normally=False, bright=False).level is tr.Level.CALL_NOW
+
+
+def test_tr1_duration_turns_watch_into_within_24h():
+    assert tr.route("vomiting", 12, True, True).level is tr.Level.WATCH
+    assert tr.route("vomiting", 48, True, True).level is tr.Level.WITHIN_24H
+
+
+def test_tr1_only_ever_says_where_to_go_never_what_it_is():
+    outcomes = {
+        tr.route(key, hours, eating, bright).headline
+        for key in tr.BY_KEY
+        for hours, _ in tr.DURATIONS
+        for eating in (True, False)
+        for bright in (True, False)
+    }
+    assert outcomes == {"Call now", "See a vet within 24 hours", "Keep an eye on it"}
+
+
+def test_tr1_unknown_input_is_rejected():
+    with pytest.raises(ValueError):
+        tr.route("sneezing", 3, True, True)
+    with pytest.raises(ValueError):
+        tr.route("vomiting", 7, True, True)
+
+
+def _kitten(born: date = date(2026, 8, 20)) -> Pet:
+    return Pet("k", "Pip", "cat", "DSH", born, "o")
+
+
+def test_np1_course_runs_every_4_weeks_until_16_weeks():
+    steps = pathway.vaccine_steps(_kitten(), [date(2026, 10, 15)], TODAY)
+    assert [s.when for s in steps] == ["", "from 12 Nov", "from 10 Dec"]
+
+
+def test_np1_course_is_done_after_a_dose_at_16_weeks():
+    doses = [date(2026, 10, 15), date(2026, 11, 12), date(2026, 12, 10)]
+    steps = pathway.vaccine_steps(_kitten(), doses, date(2026, 12, 11))
+    assert all(s.done for s in steps) and len(steps) == 3
+
+
+def test_np1_pathway_is_for_pets_under_six_months():
+    assert pathway.is_young(_kitten(), TODAY)
+    assert not pathway.is_young(_kitten(born=date(2026, 1, 1)), TODAY)
+
+
+def test_np2_tip_matches_the_pets_age():
+    assert "litter tray" in pathway.tip(_kitten(), TODAY)
+
+
+def test_vr1_progress_counts_days_from_the_visit():
+    step = recaps.Instruction("Lead walks", days=14)
+    assert recaps.progress(step, date(2026, 10, 22), TODAY) == "Day 6 of 14"
+    assert recaps.progress(step, date(2026, 10, 1), TODAY) == "Finished"
+    assert recaps.progress(recaps.Instruction("Check in"), date(2026, 10, 22), TODAY) == ""
+
+
+def test_vr1_old_recaps_drop_off():
+    old = recaps.Recap("r", "p", date(2026, 6, 1), "Dr Lee", "", [], [], "", None)
+    assert recaps.latest([old], TODAY) is None

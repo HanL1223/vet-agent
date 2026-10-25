@@ -12,8 +12,8 @@
     .bar { max-width: 1120px; margin: 0 auto; padding: 16px 24px 0; display: flex; flex-wrap: wrap; gap: 8px 24px; align-items: flex-end; justify-content: space-between; }
     .brand { display: flex; gap: 12px; align-items: center; padding-bottom: 14px; }
     .brand .mark { width: 34px; height: 34px; }
-    nav { display: flex; gap: 4px; }
-    nav button { min-height: 44px; padding: 0 14px; border: 0; border-bottom: 2px solid transparent; background: none; color: var(--muted); font-weight: 600; }
+    nav { display: flex; gap: 4px; max-width: 100%; overflow-x: auto; scrollbar-width: none; }
+    nav button { min-height: 44px; padding: 0 14px; border: 0; border-bottom: 2px solid transparent; background: none; color: var(--muted); font-weight: 600; white-space: nowrap; }
     nav button:hover { color: var(--ink); }
     nav button[aria-selected="true"] { color: var(--ink); border-bottom-color: var(--sage); font-weight: 700; }
     .preview { padding-bottom: 14px; }
@@ -39,6 +39,31 @@
     .plan .price { font-family: "Fraunces", Georgia, serif; font-size: 30px; }
     .plan ul { margin: 4px 0 0; padding-left: 18px; line-height: 1.8; font-size: 14px; color: var(--ink-2); }
     .req { grid-template-columns: minmax(180px, 1fr) minmax(240px, 2.4fr) 170px; }
+    .est { grid-template-columns: minmax(180px, 1fr) minmax(220px, 1.6fr) 140px 190px; }
+    .est-editor { padding: 4px 22px 20px; display: grid; gap: 12px; border-top: 1px dashed var(--rule); }
+    .est-line { display: grid; grid-template-columns: minmax(180px, 1fr) minmax(240px, 2fr); gap: 4px 16px; }
+    .reply { padding: 0 22px 16px; }
+    textarea, select, input[type="text"], input[type="date"], input[type="number"] {
+      width: 100%; min-height: 40px; padding: 8px 10px; border-radius: 8px; font: inherit;
+      border: 1px solid var(--edge); background: var(--ground); color: var(--ink);
+    }
+    textarea { resize: vertical; }
+    .recap-layout { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr); gap: 20px; align-items: start; }
+    .recap-form { padding: 20px 22px; display: grid; gap: 14px; }
+    .field { display: grid; gap: 4px; }
+    .field > label, .group-title { font-weight: 700; font-size: 14px; }
+    .two { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .item-row { display: grid; grid-template-columns: 1fr 90px 44px; gap: 8px; align-items: center; }
+    .result-row { display: grid; grid-template-columns: 1fr 150px 44px; gap: 8px; }
+    .result-row textarea { grid-column: 1 / -1; }
+    .remove { width: 40px; height: 40px; border-radius: 8px; border: 1px solid var(--edge); background: none; }
+    .form-actions { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+    .recap-item { padding: 14px 18px; display: grid; gap: 4px; }
+    .recap-item + .recap-item { border-top: 1px solid var(--rule); }
+    .ok { color: var(--sage-dark); font-weight: 700; }
+    .link { justify-self: start; border: 0; background: none; padding: 4px 0; color: var(--sage-dark); font-weight: 600; text-decoration: underline; text-underline-offset: 3px; }
+    .recap-head { display: flex; justify-content: space-between; gap: 12px; }
+    .bad { color: var(--urgent); font-size: 13px; }
     .empty { padding: 28px 22px; }
     @media (max-width: 860px) {
       .kpis { grid-template-columns: 1fr 1fr; }
@@ -51,6 +76,9 @@
       .row .when { text-align: left; grid-row: 3; }
       .row .act { grid-row: 3; }
       .req .when { grid-row: 1; text-align: right; }
+      .est { grid-template-columns: 1fr; }
+      .est .act { justify-content: flex-start; }
+      .est-line, .recap-layout, .two { grid-template-columns: 1fr; }
     }
   </style>
 </head>
@@ -66,6 +94,8 @@
     </div>
     <nav role="tablist" aria-label="Views">
       <button role="tab" data-tab="gaps" aria-selected="true">Due for care</button>
+      <button role="tab" data-tab="estimates" aria-selected="false">Estimates</button>
+      <button role="tab" data-tab="recaps" aria-selected="false">Visit recaps</button>
       <button role="tab" data-tab="plans" aria-selected="false">Care plans</button>
       <button role="tab" data-tab="requests" aria-selected="false">Requests</button>
     </nav>
@@ -95,6 +125,32 @@
     <p class="muted small note">Reminders go out in the clinic's name. In this demo the send is recorded, not delivered.</p>
   </section>
 
+  <section id="tab-estimates" hidden aria-labelledby="est-title">
+    <div class="section-head">
+      <div>
+        <h2 id="est-title" style="font-size: 22px">Estimates for owners</h2>
+        <p class="muted small" style="margin-top: 2px">Open estimates from ezyVet. Check the wording for each line, then send: owners only see what you send.</p>
+      </div>
+    </div>
+    <div class="card list" id="estimates"></div>
+  </section>
+
+  <section id="tab-recaps" hidden aria-labelledby="recap-title">
+    <div class="section-head">
+      <div>
+        <h2 id="recap-title" style="font-size: 22px">Visit recaps</h2>
+        <p class="muted small" style="margin-top: 2px">What the owner should know after a visit, in plain words. It appears under Last visit in their app.</p>
+      </div>
+    </div>
+    <div class="recap-layout">
+      <form class="card recap-form" id="recap-form" novalidate></form>
+      <div>
+        <h3 class="label" style="margin: 4px 0 10px">Released recently</h3>
+        <div class="card list" id="recap-list"></div>
+      </div>
+    </div>
+  </section>
+
   <section id="tab-plans" hidden aria-labelledby="plans-title">
     <div class="section-head">
       <h2 id="plans-title" style="font-size: 22px">Care plans</h2>
@@ -114,5 +170,6 @@
 </main>
 <script src="/static/common.js"></script>
 <script src="/static/clinic.js"></script>
+<script src="/static/clinic-care.js"></script>
 </body>
 </html>

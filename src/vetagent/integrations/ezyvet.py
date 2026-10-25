@@ -14,12 +14,13 @@ from pathlib import Path
 from typing import Any, Protocol
 from zoneinfo import ZoneInfo
 
+from vetagent.domain.estimates import Estimate, EstimateLine
 from vetagent.domain.models import (
     BenefitUse,
     CareEvent,
+    ClinicContact,
     Membership,
     Owner,
-    ParasiteProduct,
     Pet,
     Plan,
 )
@@ -62,6 +63,7 @@ class EzyVetPracticeSystem:
         self._read_patients(source)
         self._read_care(source)
         self._read_plans(source)
+        self._read_estimates(source)
 
     # --- PracticeSystem --------------------------------------------------------------
 
@@ -70,6 +72,9 @@ class EzyVetPracticeSystem:
 
     def lead_vet(self) -> str:
         return self._lead_vet
+
+    def vets(self) -> list[str]:
+        return sorted(set(self._vets.values()))
 
     def price_list(self) -> dict[str, int]:
         return dict(self._prices)
@@ -95,19 +100,20 @@ class EzyVetPracticeSystem:
     def benefit_uses(self, pet_id: str) -> list[BenefitUse]:
         return [u for u in self._uses if u.pet_id == pet_id]
 
-    def parasite_products(self) -> list[ParasiteProduct]:
-        return [
-            ParasiteProduct(g["label"], g["lasts_days"], g.get("owner_given", False))
-            for g in self._config["care_groups"].values()
-            if g["type"] == "parasite"
-        ]
+    def estimates(self, pet_id: str) -> list[Estimate]:
+        return [e for e in self._estimates if e.pet_id == pet_id]
+
+    def contact(self) -> ClinicContact:
+        return ClinicContact(**self._config["contact"])
+
+    def payment_options(self) -> list[str]:
+        return list(self._config.get("payment_options", []))
 
     # --- Reading ---------------------------------------------------------------------
 
     def _read_clinic(self, source: EzyVetSource) -> None:
-        users = {str(u["id"]): u for u in source.list("v1/user")}
-        vet = users[self._config["lead_vet_user_id"]]
-        self._lead_vet = f"{vet.get('title') or 'Dr'} {vet['last_name']}"
+        self._vets = {str(u["id"]): to_vet(u) for u in source.list("v1/user")}
+        self._lead_vet = self._vets[self._config["lead_vet_user_id"]]
         products = {str(p["id"]): p for p in source.list("v1/product")}
         self._prices = {
             key: round(float(products[product_id]["price"]))
@@ -229,6 +235,7 @@ class EzyVetPracticeSystem:
                 benefits=benefits.get(str(p["id"]), []),
                 covers=covers.get(str(p["id"]), []),
                 life_stage=self._config.get("plan_life_stage", {}).get(str(p["id"])),
+                species=self._config.get("plan_species", {}).get(str(p["id"]), []),
             )
             for p in source.list("v2/wellnessplan")
             if p.get("active", True)
@@ -257,6 +264,34 @@ class EzyVetPracticeSystem:
             if str(line.get("wellness_plan_membership_id")) in member_ids
         ]
 
+    def _read_estimates(self, source: EzyVetSource) -> None:
+        """CO-1: open estimates for current patients. Field names are assumed (docs/ezyvet.md)."""
+        explain = self._config.get("owner_explanations", {})
+        care_type = self._config.get("product_care_type", {})
+        self._estimates = [
+            Estimate(
+                id=str(e["id"]),
+                pet_id=str(e["animal_id"]),
+                title=e["name"],
+                vet=self._vets.get(str(e.get("user_id")), self._lead_vet),
+                created=self._date(e["created_at"]),
+                expires=self._date(e["expires_at"]),
+                lines=[
+                    EstimateLine(
+                        name=line["name"],
+                        explanation=explain.get(str(line["product_id"]), ""),
+                        low=round(float(line["low"])),
+                        high=round(float(line["high"])),
+                        optional=_yes(line.get("is_optional", False)),
+                        care_type=care_type.get(str(line["product_id"])),
+                    )
+                    for line in e["items"]
+                ],
+            )
+            for e in source.list("v1/estimate")
+            if e.get("status") == "Active" and str(e["animal_id"]) in self._pets
+        ]
+
     def _date(self, epoch: int | str) -> date:
         """ezyVet timestamps are epoch seconds; the calendar date is the clinic's local one."""
         return datetime.fromtimestamp(int(epoch), self._tz).date()
@@ -267,6 +302,10 @@ def to_owner(contact: dict) -> Owner:
     last = (contact.get("last_name") or "").strip()
     name = f"{contact['first_name']} {last[0]}." if last else contact["first_name"]
     return Owner(id=str(contact["id"]), name=name)
+
+
+def to_vet(user: dict) -> str:
+    return f"{user.get('title') or 'Dr'} {user['last_name']}"
 
 
 def is_current_patient(animal: dict) -> bool:

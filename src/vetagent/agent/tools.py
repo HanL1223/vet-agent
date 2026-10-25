@@ -161,6 +161,38 @@ def propose_vet_note(ctx: ToolContext, args: dict[str, Any]) -> ToolOutput:
     return ToolOutput({**basics, "status": "awaiting owner confirmation"}, card)
 
 
+def propose_estimate_reply(ctx: ToolContext, args: dict[str, Any]) -> ToolOutput:
+    """CO-3: the owner's answer to a clinic estimate, prepared for them to confirm."""
+    wanted = str(args["estimate_id"])
+    estimate = next((e for e in ctx.practice.estimates(ctx.pet_id) if e.id == wanted), None)
+    if estimate is None:
+        raise ValueError(f"No open estimate {wanted}")
+    choice = str(args["choice"])
+    if choice == "accept":
+        chosen = {str(n) for n in args.get("optional_lines") or []}
+        lines = [line.name for line in estimate.lines if not line.optional or line.name in chosen]
+        detail = f"Go ahead with {estimate.title.lower()}: {', '.join(lines)}"
+    elif choice == "cheaper":
+        detail = f"Is there a lower-cost option for {estimate.title.lower()}?"
+    elif choice == "question":
+        detail = f"Question about {estimate.title.lower()}: {str(args['question']).strip()}"
+    else:
+        raise ValueError(f"Unknown choice {choice}")
+    proposal = ctx.store.create_proposal(
+        ctx.owner_id,
+        "estimate_reply",
+        {"pet_id": ctx.pet_id, "estimate_id": estimate.id, "choice": choice, "detail": detail},
+    )
+    card = {
+        "type": "proposal",
+        "proposal_id": proposal.id,
+        "title": f"Reply to {estimate.vet}'s estimate",
+        "detail": detail,
+        "action": "Send to clinic",
+    }
+    return ToolOutput({**_pet_basics(ctx), "status": "awaiting owner confirmation"}, card)
+
+
 TOOLS: list[Tool] = [
     Tool(
         "list_care_due",
@@ -214,6 +246,24 @@ TOOLS: list[Tool] = [
         {"type": "object", "properties": {"note": {"type": "string"}}, "required": ["note"]},
         "drafted a note for the vet",
         propose_vet_note,
+    ),
+    Tool(
+        "propose_estimate_reply",
+        "Prepare the owner's reply to an open clinic estimate: accept it (with any optional "
+        "lines they chose), ask for a lower-cost option, or ask a question. Never say whether "
+        "a line is clinically needed.",
+        {
+            "type": "object",
+            "properties": {
+                "estimate_id": {"type": "string"},
+                "choice": {"type": "string", "enum": ["accept", "cheaper", "question"]},
+                "optional_lines": {"type": "array", "items": {"type": "string"}},
+                "question": {"type": "string"},
+            },
+            "required": ["estimate_id", "choice"],
+        },
+        "prepared a reply to the estimate",
+        propose_estimate_reply,
     ),
 ]
 
