@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Clinic dashboard · Vet care agent</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/app.css">
+  <style>
+    header { background: var(--surface); border-bottom: 1px solid var(--line); }
+    .bar { max-width: 1240px; margin: 0 auto; padding: 14px 24px; display: flex; flex-wrap: wrap; gap: 16px; align-items: center; justify-content: space-between; }
+    .logo { width: 40px; height: 40px; border-radius: 10px; background: var(--brand); display: grid; place-items: center; color: #fff; font-weight: 700; }
+    nav { display: flex; gap: 6px; background: #eef3f1; padding: 4px; border-radius: 10px; }
+    nav button { min-height: 40px; padding: 0 16px; border: 0; border-radius: 8px; background: transparent; color: #4a5753; font-weight: 600; }
+    nav button[aria-selected="true"] { background: var(--surface); color: var(--ink); font-weight: 700; box-shadow: 0 1px 2px rgba(19,32,28,.12); }
+    main { max-width: 1240px; margin: 0 auto; padding: 24px; display: grid; gap: 24px; }
+    .kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 16px; }
+    .kpi { padding: 18px; }
+    .kpi b { display: block; font-size: 30px; margin-top: 6px; }
+    .panel-head { padding: 20px; display: flex; flex-wrap: wrap; gap: 16px; align-items: flex-end; justify-content: space-between; border-bottom: 1px solid var(--line-soft); }
+    .filters { display: flex; flex-wrap: wrap; gap: 8px; }
+    .row { display: flex; flex-wrap: wrap; gap: 16px; align-items: center; padding: 16px 20px; border-bottom: 1px solid var(--line-soft); }
+    .row .who { flex: 1 1 220px; min-width: 0; }
+    .row .what { flex: 2 1 280px; min-width: 0; }
+    .row .when { flex: 0 0 140px; }
+    .row .act { flex: 0 0 170px; display: flex; justify-content: flex-end; }
+    .overdue { color: var(--warn); font-weight: 600; }
+    .soon { color: var(--brand-dark); font-weight: 600; }
+    .sent { color: var(--brand-dark); font-weight: 600; min-height: 44px; display: flex; align-items: center; }
+    .foot { padding: 16px 20px; display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between; background: #f8fbfa; }
+    .plans { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; }
+    .plan { padding: 20px; display: grid; gap: 10px; }
+    .plan ul { margin: 0; padding-left: 18px; line-height: 1.7; font-size: 14px; }
+    .empty { padding: 24px 20px; }
+  </style>
+</head>
+<body>
+<header>
+  <div class="bar">
+    <div style="display: flex; gap: 12px; align-items: center">
+      <div class="logo" aria-hidden="true">N</div>
+      <div>
+        <div id="clinic-name" style="font-weight: 700; font-size: 17px">Clinic</div>
+        <div class="muted small">Care-plan platform · clinic view</div>
+      </div>
+    </div>
+    <nav role="tablist" aria-label="Views">
+      <button role="tab" data-tab="gaps" aria-selected="true">Care gaps</button>
+      <button role="tab" data-tab="plans" aria-selected="false">Plans</button>
+      <button role="tab" data-tab="requests" aria-selected="false">Requests</button>
+    </nav>
+    <a href="/owner" class="small">Open owner agent</a>
+  </div>
+</header>
+
+<main>
+  <div>
+    <h1 style="font-size: 26px">Today at the clinic</h1>
+    <p id="today" class="muted" style="margin-top: 6px"></p>
+  </div>
+  <div class="kpis" id="kpis" aria-live="polite"></div>
+
+  <section id="tab-gaps" class="card" aria-labelledby="gaps-title">
+    <div class="panel-head">
+      <div>
+        <h2 id="gaps-title" style="font-size: 19px">Care-gap radar</h2>
+        <p class="muted small" style="margin-top: 4px">Ranked by value. Built from vaccinations, parasite repeats, senior screening and exam findings.</p>
+      </div>
+      <div class="filters" role="group" aria-label="Filter by care type" id="filters"></div>
+    </div>
+    <div id="gap-rows"></div>
+    <div class="foot">
+      <span class="muted small">Reminders go out in the clinic's name. The demo records the send.</span>
+      <button class="btn ghost" id="send-all">Send all shown</button>
+    </div>
+  </section>
+
+  <section id="tab-plans" hidden aria-labelledby="plans-title">
+    <h2 id="plans-title" style="font-size: 19px; margin-bottom: 12px">Care plans</h2>
+    <div class="plans" id="plans"></div>
+  </section>
+
+  <section id="tab-requests" class="card" hidden aria-labelledby="req-title">
+    <div class="panel-head">
+      <div>
+        <h2 id="req-title" style="font-size: 19px">Requests from owners</h2>
+        <p class="muted small" style="margin-top: 4px">Bookings and notes owners confirmed in the care agent.</p>
+      </div>
+    </div>
+    <div id="requests"></div>
+  </section>
+</main>
+<script src="/static/common.js"></script>
+<script src="/static/clinic.js"></script>
+</body>
+</html>

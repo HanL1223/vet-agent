@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Vet care agent demo</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/app.css">
+  <style>
+    main { max-width: 760px; margin: 0 auto; padding: 48px 20px; display: grid; gap: 24px; }
+    .views { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; }
+    .views a { display: block; padding: 20px; text-decoration: none; color: inherit; }
+    .views a:hover { border-color: var(--brand); }
+    ol { margin: 0; padding-left: 20px; line-height: 1.8; }
+  </style>
+</head>
+<body>
+<main>
+  <div>
+    <h1 style="font-size: 28px">Vet care agent demo</h1>
+    <p class="muted" style="margin-top: 6px">Northside Family Vets · sample data · today is fixed to 27 Oct 2026</p>
+  </div>
+  <div class="views">
+    <a class="card" href="/clinic">
+      <h2 style="font-size: 18px">Clinic dashboard</h2>
+      <p class="muted small" style="margin-top: 6px">Care-gap radar, reminders, plans and requests from owners.</p>
+    </a>
+    <a class="card" href="/owner">
+      <h2 style="font-size: 18px">Owner care agent</h2>
+      <p class="muted small" style="margin-top: 6px">Priya chats with Biscuit's care assistant.</p>
+    </a>
+  </div>
+  <section class="card" style="padding: 20px" aria-labelledby="walk">
+    <h2 id="walk" style="font-size: 18px; margin-bottom: 10px">Five-minute walkthrough</h2>
+    <ol>
+      <li>Open the <a href="/clinic">clinic dashboard</a>: 8 care gaps ranked by value. Filter to Senior, send Biscuit's reminder.</li>
+      <li>Open the <a href="/owner">owner agent</a>: it raises Biscuit's overdue screening without being asked.</li>
+      <li>Ask "Is my plan worth it?", then "Book his screening" and tap <b>Send to clinic</b>.</li>
+      <li>Say "He's limping again" (drafts a note for Dr Lee), then "He's holding his leg up" (urgent: call the clinic).</li>
+      <li>Log "31.2 kg", switch log sharing off in <b>Data</b>, log again. Back on the clinic dashboard, open <b>Requests</b>.</li>
+    </ol>
+  </section>
+</main>
+</body>
+</html>
