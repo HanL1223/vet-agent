@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Biscuit · Northside Family Vets</title>
+  <title>Your pets · Northside Family Vets</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=IBM+Plex+Mono:wght@500&family=Nunito+Sans:opsz,wght@6..12,400;6..12,600;6..12,700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/static/app.css">
@@ -22,7 +22,8 @@
 </header>
 
 <div class="layout" data-show="board">
-  <main class="board" id="board" aria-live="polite">
+  <main class="board" id="board">
+    <nav class="pets" role="tablist" aria-label="Your pets" id="pets"></nav>
     <section class="hero">
       <div class="pet-face big" id="avatar"></div>
       <div>
@@ -30,12 +31,17 @@
         <p class="muted" id="pet-meta"></p>
       </div>
     </section>
-    <div class="tiles">
-      <section class="card tile" aria-labelledby="t-due"><h2 class="label" id="t-due">Needs attention</h2><div id="due"></div></section>
-      <section class="card tile" aria-labelledby="t-check"><h2 class="label" id="t-check">Weekly check-in</h2><div id="checkin"></div></section>
-      <section class="card tile" aria-labelledby="t-cover"><h2 class="label" id="t-cover">Parasite cover, last 12 months</h2><div id="cover"></div></section>
-      <section class="card tile" aria-labelledby="t-cost"><h2 class="label" id="t-cost">Next 12 months of care</h2><div id="cost"></div></section>
-      <section class="card tile" aria-labelledby="t-weight"><h2 class="label" id="t-weight">Weight</h2><div id="weight"></div></section>
+    <button class="worry" id="open-triage" aria-expanded="false">
+      <span><b>Something not right?</b><span class="muted small"> Check if <span id="worry-pet">your pet</span> should come in</span></span>
+      <span aria-hidden="true">&rarr;</span>
+    </button>
+    <div class="tiles" aria-live="polite">
+      <section class="card tile" id="t-triage" hidden aria-labelledby="h-triage"><h2 class="label" id="h-triage">Should I come in?</h2><div id="triage"></div></section>
+      <section class="card tile" id="t-costs" aria-labelledby="h-costs"><h2 class="label" id="h-costs">Costs</h2><div id="costs"></div></section>
+      <section class="card tile" id="t-visit" aria-labelledby="h-visit"><h2 class="label" id="h-visit">Last visit</h2><div id="visit"></div></section>
+      <section class="card tile" id="t-pathway" aria-labelledby="h-pathway"><h2 class="label" id="h-pathway">First 90 days</h2><div id="pathway"></div></section>
+      <section class="card tile" id="t-due" aria-labelledby="h-due"><h2 class="label" id="h-due">Coming up</h2><div id="due"></div></section>
+      <section class="card tile" id="t-checkin" aria-labelledby="h-checkin"><h2 class="label" id="h-checkin">Weekly check-in</h2><div id="checkin"></div></section>
     </div>
     <p id="board-error" class="error" role="alert"></p>
   </main>
@@ -71,7 +77,7 @@
     </div>
     <div class="switch-row">
       <div><b class="small">Share my home log with the clinic</b>
-        <div class="muted small">Your vet sees weights, check-ins and notes before visits.</div></div>
+        <div class="muted small">Your vet sees check-ins, weights and notes before visits.</div></div>
       <button class="switch" role="switch" id="share-log" aria-checked="true" aria-label="Share my home log with the clinic"><span></span></button>
     </div>
     <div class="switch-row">

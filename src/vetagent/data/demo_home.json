@@ -1,84 +1,118 @@
 {
-  "1201": [
-    {
-      "week": "2026-W36",
-      "scores": {
-        "appetite": 4,
-        "energy": 3,
-        "mobility": 4,
-        "comfort": 4,
-        "toileting": 4
+  "checkins": {
+    "1201": [
+      {
+        "week": "2026-W36",
+        "scores": {
+          "appetite": 4,
+          "energy": 3,
+          "mobility": 4,
+          "comfort": 4,
+          "toileting": 4
+        }
+      },
+      {
+        "week": "2026-W37",
+        "scores": {
+          "appetite": 4,
+          "energy": 3,
+          "mobility": 4,
+          "comfort": 3,
+          "toileting": 4
+        }
+      },
+      {
+        "week": "2026-W38",
+        "scores": {
+          "appetite": 4,
+          "energy": 4,
+          "mobility": 4,
+          "comfort": 4,
+          "toileting": 4
+        }
+      },
+      {
+        "week": "2026-W39",
+        "scores": {
+          "appetite": 4,
+          "energy": 3,
+          "mobility": 4,
+          "comfort": 4,
+          "toileting": 4
+        }
+      },
+      {
+        "week": "2026-W40",
+        "scores": {
+          "appetite": 4,
+          "energy": 3,
+          "mobility": 4,
+          "comfort": 4,
+          "toileting": 4
+        }
+      },
+      {
+        "week": "2026-W41",
+        "scores": {
+          "appetite": 4,
+          "energy": 3,
+          "mobility": 4,
+          "comfort": 3,
+          "toileting": 4
+        }
+      },
+      {
+        "week": "2026-W42",
+        "scores": {
+          "appetite": 4,
+          "energy": 3,
+          "mobility": 2,
+          "comfort": 3,
+          "toileting": 4
+        }
+      },
+      {
+        "week": "2026-W43",
+        "scores": {
+          "appetite": 3,
+          "energy": 2,
+          "mobility": 2,
+          "comfort": 3,
+          "toileting": 4
+        }
       }
-    },
-    {
-      "week": "2026-W37",
-      "scores": {
-        "appetite": 4,
-        "energy": 3,
-        "mobility": 4,
-        "comfort": 3,
-        "toileting": 4
+    ]
+  },
+  "recaps": {
+    "1201": [
+      {
+        "id": "rc-1201-1022",
+        "visit": "2026-10-22",
+        "vet": "Dr Lee",
+        "summary": "Biscuit's front left leg is much better: a little stiff when he gets up, but walking normally. Because your check-ins show his mobility dropping, Dr Lee suggests his overdue senior screen and, if you'd like, hip X-rays. The estimate is in your Costs.",
+        "instructions": [
+          {
+            "text": "Lead walks only: no running, jumping or ball games",
+            "days": 14
+          },
+          {
+            "text": "Two short walks a day, about 10 minutes each",
+            "days": 14
+          },
+          {
+            "text": "Keep doing your weekly check-in so Dr Lee can see the trend"
+          }
+        ],
+        "results": [
+          {
+            "name": "Urine test (in clinic)",
+            "status": "normal",
+            "comment": "All normal. Nothing to do."
+          }
+        ],
+        "follow_up": "Recheck with Dr Lee",
+        "follow_up_by": "2026-11-05"
       }
-    },
-    {
-      "week": "2026-W38",
-      "scores": {
-        "appetite": 4,
-        "energy": 4,
-        "mobility": 4,
-        "comfort": 4,
-        "toileting": 4
-      }
-    },
-    {
-      "week": "2026-W39",
-      "scores": {
-        "appetite": 4,
-        "energy": 3,
-        "mobility": 4,
-        "comfort": 4,
-        "toileting": 4
-      }
-    },
-    {
-      "week": "2026-W40",
-      "scores": {
-        "appetite": 4,
-        "energy": 3,
-        "mobility": 4,
-        "comfort": 4,
-        "toileting": 4
-      }
-    },
-    {
-      "week": "2026-W41",
-      "scores": {
-        "appetite": 4,
-        "energy": 3,
-        "mobility": 4,
-        "comfort": 3,
-        "toileting": 4
-      }
-    },
-    {
-      "week": "2026-W42",
-      "scores": {
-        "appetite": 4,
-        "energy": 3,
-        "mobility": 2,
-        "comfort": 3,
-        "toileting": 4
-      }
-    },
-    {
-      "week": "2026-W43",
-      "scores": {
-        "appetite": 3,
-        "energy": 2,
-        "mobility": 2,
-        "comfort": 3,
-        "toileting": 4
-      }
-    }
-  ]
+    ]
+  }
 }

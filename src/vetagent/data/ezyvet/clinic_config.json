@@ -31,7 +31,6 @@
       "label": "Annual heartworm injection",
       "price_key": "heartworm",
       "product_id": "303",
-      "owner_given": false,
       "lasts_days": 365
     },
     "Flea and Tick": {
@@ -39,7 +38,6 @@
       "label": "3-month flea and tick chew",
       "price_key": "parasite_repeat",
       "product_id": "302",
-      "owner_given": true,
       "lasts_days": 90
     },
     "Intestinal Worming": {
@@ -47,7 +45,6 @@
       "label": "3-month worming tablet",
       "price_key": "worming",
       "product_id": "306",
-      "owner_given": true,
       "lasts_days": 90
     },
     "Dental Procedure": {
@@ -74,5 +71,43 @@
     "7": "young",
     "8": "adult",
     "9": "senior"
+  },
+  "contact": {
+    "phone": "02 5550 0101",
+    "emergency_name": "Northside Animal Emergency (24 hours)",
+    "emergency_phone": "02 5550 0199"
+  },
+  "payment_options": [
+    "Pay at the clinic",
+    "Afterpay (4 payments)",
+    "VetPay (longer plans)"
+  ],
+  "product_care_type": {
+    "301": "vaccination",
+    "302": "parasite",
+    "303": "parasite",
+    "304": "senior",
+    "305": "dental",
+    "306": "parasite"
+  },
+  "owner_explanations": {
+    "401": "Dr Lee checks how the leg is doing and talks through the results with you.",
+    "304": "Blood and urine tests that show how the kidneys, liver and other organs are working. Recommended yearly for older pets.",
+    "402": "Pictures of the hips and joints. Sedation keeps Biscuit still and comfortable. The range depends on how many views are needed.",
+    "403": "If the X-rays or exam suggest sore joints, a two-week trial shows whether pain relief helps. The vet explains how to give it."
+  },
+  "plan_species": {
+    "7": [
+      "dog",
+      "cat"
+    ],
+    "8": [
+      "dog",
+      "cat"
+    ],
+    "9": [
+      "dog",
+      "cat"
+    ]
   }
 }

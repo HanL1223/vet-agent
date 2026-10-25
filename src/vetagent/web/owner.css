@@ -26,6 +26,7 @@ body { min-height: 100vh; min-height: 100dvh; display: flex; flex-direction: col
 /* Columns rather than a grid, so short tiles don't leave holes beside tall ones. */
 .tiles { columns: 2 320px; column-gap: 14px; }
 .tile { padding: 16px 18px 18px; display: grid; gap: 12px; break-inside: avoid; margin-bottom: 14px; }
+.tile[hidden] { display: none; } /* an empty section takes no space */
 .tile .big-number { font-family: "Fraunces", Georgia, serif; font-size: 30px; line-height: 1; }
 .row { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
 .rule-list > * + * { border-top: 1px solid var(--rule); padding-top: 10px; margin-top: 10px; }
@@ -33,6 +34,80 @@ body { min-height: 100vh; min-height: 100dvh; display: flex; flex-direction: col
 .note { font-weight: 600; }
 .note.clay { color: var(--clay); }
 .empty-state { color: var(--muted); font-size: 14px; }
+
+/* Pet tabs: one owner, several pets (OW-1). */
+.pets { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 18px; }
+.pets button {
+  display: inline-flex; align-items: center; gap: 8px; min-height: 40px; padding: 0 14px 0 8px;
+  border: 1px solid var(--edge); border-radius: 999px; background: transparent; font-weight: 600;
+}
+.pets button[aria-selected="true"] { background: var(--ink); border-color: var(--ink); color: var(--panel); }
+.pets .mini { width: 24px; height: 24px; display: inline-grid; }
+.pets .mini svg { width: 100%; height: 100%; }
+
+/* The way in when an owner is worried: always visible, never alarming. */
+.worry {
+  width: 100%; display: flex; justify-content: space-between; align-items: center; gap: 12px;
+  margin-bottom: 14px; padding: 14px 18px; text-align: left; border-radius: var(--radius);
+  border: 1px solid var(--edge); background: var(--panel); font-size: 15px;
+}
+.worry:hover { border-color: var(--ink); }
+.worry[aria-expanded="true"] { border-color: var(--ink); }
+
+select, textarea {
+  width: 100%; min-height: 44px; padding: 8px 12px; border-radius: 8px; font: inherit;
+  border: 1px solid var(--edge); background: var(--ground); color: var(--ink);
+}
+textarea { resize: vertical; }
+.yes-no { border: 0; padding: 0; margin: 0; display: flex; flex-wrap: wrap; gap: 6px 14px; }
+.yes-no legend { width: 100%; padding: 0 0 4px; font-weight: 700; font-size: 14px; }
+.yes-no label { display: inline-flex; align-items: center; gap: 6px; min-height: 32px; }
+.outcome { border-radius: 8px; padding: 14px; border: 1px solid var(--rule); display: grid; gap: 4px; }
+.outcome .headline { font-family: "Fraunces", Georgia, serif; font-size: 24px; line-height: 1.2; }
+.outcome.danger { background: var(--urgent-tint); border: 1.5px solid var(--urgent); }
+.outcome.danger .headline { color: var(--urgent); }
+.outcome.attention { background: var(--clay-tint); border-color: var(--clay-dot); }
+.outcome.attention .headline { color: var(--clay); }
+.outcome.calm { background: var(--sage-tint); border-color: transparent; }
+a.btn { display: inline-flex; align-items: center; gap: 8px; text-decoration: none; }
+a.btn:not(.ghost) { color: #fff; }
+
+/* Estimate: each line says what it's for and whether it's optional (CO-1). */
+.lines { list-style: none; margin: 0; padding: 0; }
+.lines li { padding: 8px 0; display: grid; gap: 2px; }
+.lines li + li { border-top: 1px solid var(--rule); }
+.lines label { display: inline-flex; gap: 8px; align-items: center; }
+.lines .price { white-space: nowrap; font-weight: 700; }
+.totals { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding-top: 6px; }
+.muted-number { color: var(--muted); }
+.estimate { display: grid; gap: 8px; }
+.question { display: grid; gap: 8px; }
+.year { border-top: 1px solid var(--rule); padding-top: 10px; }
+.year summary { display: flex; justify-content: space-between; gap: 8px; cursor: pointer; list-style: none; }
+.year summary::-webkit-details-marker { display: none; }
+.year summary::after { content: "+"; color: var(--muted); }
+.year[open] summary::after { content: "–"; }
+
+/* Visit recap and new-pet steps share one checklist style (VR-2, NP-1). */
+.checklist { list-style: none; margin: 0; padding: 0; }
+.checklist li { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; padding: 8px 0; }
+.checklist li + li { border-top: 1px solid var(--rule); }
+.checklist label { display: flex; gap: 10px; align-items: flex-start; }
+.checklist input[type="checkbox"] { width: 20px; height: 20px; margin-top: 2px; accent-color: var(--sage); flex: none; }
+.checklist input:checked + span { color: var(--muted); text-decoration: line-through; }
+.checklist .label, .estimate .label { white-space: nowrap; }
+.step { padding-left: 30px; position: relative; }
+.step::before {
+  content: ""; position: absolute; left: 2px; top: 4px; width: 14px; height: 14px;
+  border-radius: 50%; border: 2px solid var(--edge);
+}
+.step.done::before { background: var(--sage); border-color: var(--sage); }
+.result { border: 1px solid var(--rule); border-radius: 8px; padding: 10px 12px; display: grid; gap: 4px; }
+.result.attention { border-color: var(--clay-dot); }
+.follow { border-top: 1px solid var(--rule); padding-top: 10px; align-items: center; }
+.tip { background: var(--sunk); border-radius: 8px; padding: 10px 12px; }
+.offer { border: 1px solid var(--rule); border-radius: 8px; padding: 10px 12px; display: grid; gap: 4px; }
+.offer ul { margin: 0; padding-left: 18px; font-size: 14px; line-height: 1.7; }
 
 /* Check-in: eight weeks of totals as bars; the latest is solid ink. */
 .weeks { display: flex; align-items: flex-end; gap: 6px; height: 56px; }
@@ -53,20 +128,9 @@ body { min-height: 100vh; min-height: 100dvh; display: flex; flex-direction: col
 .scale input:focus-visible + label { outline: 2px solid var(--sage); outline-offset: 2px; }
 .scale-ends { display: flex; justify-content: space-between; }
 
-/* Cover strip: 365 days left to right; sage where protected, clay where not. */
-.strip {
-  position: relative; height: 10px; border-radius: 5px; background: var(--clay-tint); overflow: hidden;
-}
-.strip span { position: absolute; top: 0; bottom: 0; background: var(--sage); }
-
-.cost-compare { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-.cost-compare > div { border: 1px solid var(--rule); border-radius: 8px; padding: 10px 12px; }
-.cost-compare .mine { border-color: var(--ink); }
 .months { margin: 0; padding: 0; list-style: none; font-size: 14px; }
 .months li { display: grid; grid-template-columns: 64px 1fr auto; gap: 8px; padding: 5px 0; }
 .months li + li { border-top: 1px solid var(--rule); }
-
-.spark { width: 100%; height: 40px; display: block; }
 
 /* Assistant panel */
 .ask {

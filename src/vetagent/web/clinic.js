@@ -70,7 +70,7 @@ async function loadPlans() {
 
 async function loadRequests() {
   const reqs = await api("/api/clinic/requests");
-  const label = { booking_request: "Booking request", vet_note: "Note for the vet" };
+  const label = { booking_request: "Booking request", vet_note: "Note for the vet", estimate_reply: "Reply to an estimate" };
   document.getElementById("requests").innerHTML = reqs.map((r) => `
     <div class="row req">
       <div><b>${esc(r.pet)}</b><div class="muted small">${esc(label[r.kind] || r.kind)}</div></div>

@@ -53,11 +53,24 @@ CREATE TABLE IF NOT EXISTS checkins (
     created_at TEXT NOT NULL,
     PRIMARY KEY (pet_id, week)
 );
-CREATE TABLE IF NOT EXISTS owner_doses (
+CREATE TABLE IF NOT EXISTS recaps (
+    id TEXT PRIMARY KEY,
+    pet_id TEXT NOT NULL,
+    payload TEXT NOT NULL,
+    released_at TEXT NOT NULL
+);
+CREATE TABLE IF NOT EXISTS ticks (
+    pet_id TEXT NOT NULL,
+    item TEXT NOT NULL,
+    ticked_at TEXT NOT NULL,
+    PRIMARY KEY (pet_id, item)
+);
+CREATE TABLE IF NOT EXISTS triage_log (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     pet_id TEXT NOT NULL,
-    product TEXT NOT NULL,
-    given_on TEXT NOT NULL,
+    symptom TEXT NOT NULL,
+    hours INTEGER NOT NULL,
+    level TEXT NOT NULL,
     created_at TEXT NOT NULL
 );
 """
@@ -101,9 +114,14 @@ class Store:
         ).fetchall()
         return [json.loads(r["payload"]) for r in rows]
 
-    def clear_conversation(self, owner_id: str) -> None:
-        self._exec("DELETE FROM messages WHERE owner_id = ?", (owner_id,))
-        self._exec("DELETE FROM proposals WHERE owner_id = ?", (owner_id,))
+    def clear_conversation(self, conversation: str, owner_id: str, pet_id: str) -> None:
+        """Drop one pet's chat and its unsent proposals; sent requests stay with the clinic."""
+        self._exec("DELETE FROM messages WHERE owner_id = ?", (conversation,))
+        self._exec(
+            "DELETE FROM proposals WHERE owner_id = ? AND status = 'pending'"
+            " AND json_extract(payload, '$.pet_id') = ?",
+            (owner_id, pet_id),
+        )
 
     # Proposals (AG-4) ---------------------------------------------------------
     def create_proposal(self, owner_id: str, kind: str, payload: dict[str, Any]) -> Proposal:
@@ -195,18 +213,47 @@ class Store:
         ).fetchall()
         return [(r["week"], json.loads(r["scores"])) for r in rows]
 
-    # Doses the owner gave at home (HT-6); never written back to the clinic -------
-    def log_dose(self, pet_id: str, product: str, given_on: str) -> None:
+    # Visit recaps the clinic released to the owner (VR-1) -----------------------
+    def release_recap(self, recap_id: str, pet_id: str, recap: dict[str, Any]) -> None:
         self._exec(
-            "INSERT INTO owner_doses (pet_id, product, given_on, created_at) VALUES (?, ?, ?, ?)",
-            (pet_id, product, given_on, _now()),
+            "INSERT OR REPLACE INTO recaps (id, pet_id, payload, released_at) VALUES (?, ?, ?, ?)",
+            (recap_id, pet_id, json.dumps(recap), _now()),
         )
 
-    def owner_doses(self, pet_id: str) -> list[tuple[str, str]]:
+    def recaps(self, pet_id: str) -> list[dict[str, Any]]:
         rows = self._db.execute(
-            "SELECT product, given_on FROM owner_doses WHERE pet_id = ? ORDER BY id", (pet_id,)
+            "SELECT payload FROM recaps WHERE pet_id = ? ORDER BY released_at", (pet_id,)
         ).fetchall()
-        return [(r["product"], r["given_on"]) for r in rows]
+        return [json.loads(r["payload"]) for r in rows]
+
+    # Things the owner ticked off: recap instructions (VR-2), new-pet steps (NP-1) ---
+    def set_tick(self, pet_id: str, item: str, done: bool) -> None:
+        if done:
+            self._exec(
+                "INSERT OR IGNORE INTO ticks (pet_id, item, ticked_at) VALUES (?, ?, ?)",
+                (pet_id, item, _now()),
+            )
+        else:
+            self._exec("DELETE FROM ticks WHERE pet_id = ? AND item = ?", (pet_id, item))
+
+    def ticks(self, pet_id: str) -> set[str]:
+        rows = self._db.execute("SELECT item FROM ticks WHERE pet_id = ?", (pet_id,))
+        return {r["item"] for r in rows}
+
+    # "Should I come in?" answers, kept for clinic insight (TR-5) -------------------
+    def log_triage(self, pet_id: str, symptom: str, hours: int, level: str) -> None:
+        self._exec(
+            "INSERT INTO triage_log (pet_id, symptom, hours, level, created_at)"
+            " VALUES (?, ?, ?, ?, ?)",
+            (pet_id, symptom, hours, level, _now()),
+        )
+
+    def triage_log(self, pet_id: str) -> list[dict[str, Any]]:
+        rows = self._db.execute(
+            "SELECT symptom, hours, level FROM triage_log WHERE pet_id = ? ORDER BY id",
+            (pet_id,),
+        ).fetchall()
+        return [dict(r) for r in rows]
 
     def _exec(self, sql: str, params: tuple) -> None:
         with self._db:

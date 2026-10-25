@@ -1,0 +1,53 @@
+{
+  "meta": {
+    "timestamp": 1793066400,
+    "items_page": 1,
+    "items_page_total": 1,
+    "items_page_size": 1,
+    "items_total": 1
+  },
+  "items": [
+    {
+      "estimate": {
+        "id": "5101",
+        "animal_id": "1201",
+        "contact_id": "501",
+        "user_id": "12",
+        "name": "Senior health screen and hip check",
+        "status": "Active",
+        "created_at": 1792630800,
+        "expires_at": 1795222800,
+        "items": [
+          {
+            "product_id": "401",
+            "name": "Consultation, recheck",
+            "low": "92.00",
+            "high": "92.00",
+            "is_optional": false
+          },
+          {
+            "product_id": "304",
+            "name": "Senior blood and urine screening",
+            "low": "280.00",
+            "high": "280.00",
+            "is_optional": false
+          },
+          {
+            "product_id": "402",
+            "name": "Hip X-rays with sedation",
+            "low": "420.00",
+            "high": "560.00",
+            "is_optional": true
+          },
+          {
+            "product_id": "403",
+            "name": "Pain-relief trial, 14 days",
+            "low": "65.00",
+            "high": "65.00",
+            "is_optional": true
+          }
+        ]
+      }
+    }
+  ]
+}

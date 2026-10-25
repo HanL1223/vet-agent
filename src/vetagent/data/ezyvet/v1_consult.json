@@ -1,10 +1,10 @@
 {
   "meta": {
     "timestamp": 1793066400,
-    "items_page_size": 1,
+    "items_page_size": 2,
     "items_page": 1,
     "items_page_total": 1,
-    "items_total": 1
+    "items_total": 2
   },
   "items": [
     {
@@ -14,6 +14,15 @@
         "date": 1786672800,
         "user_id": "12",
         "description": "Mild strain in the front left leg. Rest for a week, short lead walks, recheck if still limping."
+      }
+    },
+    {
+      "consult": {
+        "id": "8802",
+        "animal_id": "1201",
+        "date": 1792630800,
+        "user_id": "12",
+        "description": "Recheck front left leg: mild stiffness on rising, sound at walk. Lead walks and rest 14 days. Senior screen overdue; hip X-rays offered given home check-ins show reduced mobility. Estimate given."
       }
     }
   ]

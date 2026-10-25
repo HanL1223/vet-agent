@@ -7,13 +7,16 @@ from fastapi import APIRouter, HTTPException, Request
 from vetagent.api.schemas import (
     CheckInRequest,
     ConsentRequest,
-    DoseRequest,
+    EstimateReply,
     MessageRequest,
+    QuestionRequest,
     ReminderRequest,
+    TickRequest,
+    TriageRequest,
 )
 from vetagent.api.wiring import Services
 from vetagent.domain.models import GapType
-from vetagent.services.home import DashboardError
+from vetagent.services.home import DashboardError, PetNotFound
 from vetagent.services.owner_agent import ProposalError
 
 clinic = APIRouter(prefix="/api/clinic", tags=["clinic"])
@@ -54,79 +57,139 @@ def requests_from_owners(request: Request) -> list[dict]:
     return _services(request).clinic.clinic_requests()
 
 
-# Owner care agent --------------------------------------------------------------
+# Owner app: every call names the pet, and only the owner's own pets are allowed (OW-1) ----
+
+
+def _pet(request: Request, pet: str) -> str:
+    try:
+        return _services(request).home.pet(pet).id
+    except PetNotFound as exc:
+        raise HTTPException(404, "Pet not found") from exc
+
+
+@owner.get("/pets")
+def pets(request: Request) -> list[dict]:
+    return _services(request).home.pets()
+
+
+@owner.get("/dashboard")
+def dashboard(request: Request, pet: str) -> dict:
+    return _services(request).home.dashboard(_pet(request, pet))
 
 
 @owner.get("/conversation")
-def conversation(request: Request) -> dict:
-    return _services(request).owner_agent.conversation()
+def conversation(request: Request, pet: str) -> dict:
+    return _services(request).owner_agent.conversation(_pet(request, pet))
 
 
 @owner.post("/messages")
-def send_message(request: Request, body: MessageRequest) -> dict:
+def send_message(request: Request, pet: str, body: MessageRequest) -> dict:
     if not body.text.strip():
         raise HTTPException(400, "Message is empty")
-    return _services(request).owner_agent.send(body.text)
+    return _services(request).owner_agent.send(_pet(request, pet), body.text)
 
 
 @owner.post("/proposals/{proposal_id}/confirm")
 def confirm(request: Request, proposal_id: str) -> dict:
-    try:
-        return _services(request).owner_agent.confirm(proposal_id)
-    except ProposalError as exc:
-        raise HTTPException(409, str(exc)) from exc
+    return _proposal(lambda agent: agent.confirm(proposal_id), request)
 
 
 @owner.post("/proposals/{proposal_id}/dismiss")
 def dismiss(request: Request, proposal_id: str) -> dict:
-    try:
-        return _services(request).owner_agent.dismiss(proposal_id)
-    except ProposalError as exc:
-        raise HTTPException(409, str(exc)) from exc
+    return _proposal(lambda agent: agent.dismiss(proposal_id), request)
 
 
 @owner.put("/consent")
-def set_consent(request: Request, body: ConsentRequest) -> dict:
-    return _services(request).owner_agent.set_consent(body.share_log, body.deidentified_use)
-
-
-@owner.post("/checkup")
-def checkup(request: Request) -> dict:
-    try:
-        return _services(request).owner_agent.propose_checkup()
-    except ProposalError as exc:
-        raise HTTPException(409, str(exc)) from exc
+def set_consent(request: Request, pet: str, body: ConsentRequest) -> dict:
+    agent = _services(request).owner_agent
+    return agent.set_consent(_pet(request, pet), body.share_log, body.deidentified_use)
 
 
 @owner.post("/reset")
-def reset(request: Request) -> dict:
-    return _services(request).owner_agent.reset()
-
-
-# Owner pet dashboard -------------------------------------------------------------
-
-
-@owner.get("/dashboard")
-def dashboard(request: Request) -> dict:
-    return _services(request).home.dashboard()
-
-
-@owner.get("/household")
-def household(request: Request) -> dict:
-    return {"species": _services(request).home.household()}
+def reset(request: Request, pet: str) -> dict:
+    return _services(request).owner_agent.reset(_pet(request, pet))
 
 
 @owner.post("/checkins")
-def check_in(request: Request, body: CheckInRequest) -> dict:
+def check_in(request: Request, pet: str, body: CheckInRequest) -> dict:
+    return _dashboard(lambda home: home.check_in(_pet(request, pet), body.scores), request)
+
+
+@owner.post("/checkup")
+def checkup(request: Request, pet: str) -> dict:
+    pet_id = _pet(request, pet)
+    return _proposal(lambda agent: agent.propose_checkup(pet_id), request)
+
+
+@owner.post("/triage")
+def triage(request: Request, pet: str, body: TriageRequest) -> dict:
+    pet_id = _pet(request, pet)
+    return _dashboard(
+        lambda home: home.triage(pet_id, body.symptom, body.hours, body.eating, body.bright),
+        request,
+    )
+
+
+@owner.post("/triage/request")
+def triage_request(request: Request, pet: str, body: TriageRequest) -> dict:
+    """TR-3: the outcome is worked out again here, never trusted from the page."""
+    pet_id = _pet(request, pet)
+    result = _dashboard(
+        lambda home: home.triage(pet_id, body.symptom, body.hours, body.eating, body.bright),
+        request,
+    )
+    return _proposal(
+        lambda agent: agent.propose_from_triage(
+            pet_id, result["level"], result["symptom"], result["duration"]
+        ),
+        request,
+    )
+
+
+@owner.post("/estimates/{estimate_id}/reply")
+def estimate_reply(request: Request, pet: str, estimate_id: str, body: EstimateReply) -> dict:
+    pet_id = _pet(request, pet)
+    _dashboard(lambda home: home.estimate(pet_id, estimate_id), request)
+    return _proposal(
+        lambda agent: agent.propose_estimate_reply(
+            pet_id, estimate_id, body.choice, body.optional_lines, body.question
+        ),
+        request,
+    )
+
+
+@owner.post("/ticks")
+def tick(request: Request, pet: str, body: TickRequest) -> dict:
+    return _dashboard(lambda home: home.tick(_pet(request, pet), body.item, body.done), request)
+
+
+@owner.post("/visits/{recap_id}/follow-up")
+def visit_follow_up(request: Request, pet: str, recap_id: str) -> dict:
+    pet_id = _pet(request, pet)
+    recap = _dashboard(lambda home: home.recap(pet_id, recap_id), request)
+    when = f"by {recap.follow_up_by.day} {recap.follow_up_by:%b}" if recap.follow_up_by else ""
+    return _proposal(lambda agent: agent.propose_follow_up(pet_id, recap.follow_up, when), request)
+
+
+@owner.post("/visits/{recap_id}/question")
+def visit_question(request: Request, pet: str, recap_id: str, body: QuestionRequest) -> dict:
+    pet_id = _pet(request, pet)
+    recap = _dashboard(lambda home: home.recap(pet_id, recap_id), request)
+    visit = f"{recap.visit.day} {recap.visit:%b}"
+    return _proposal(
+        lambda agent: agent.propose_visit_question(pet_id, visit, body.question), request
+    )
+
+
+def _dashboard(call, request: Request):
     try:
-        return _services(request).home.check_in(body.scores)
+        return call(_services(request).home)
     except DashboardError as exc:
         raise HTTPException(400, str(exc)) from exc
 
 
-@owner.post("/doses")
-def log_dose(request: Request, body: DoseRequest) -> dict:
+def _proposal(call, request: Request):
     try:
-        return _services(request).home.log_dose(body.product)
-    except DashboardError as exc:
-        raise HTTPException(400, str(exc)) from exc
+        return call(_services(request).owner_agent)
+    except ProposalError as exc:
+        raise HTTPException(409, str(exc)) from exc
