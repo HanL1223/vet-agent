@@ -1,0 +1,235 @@
+{
+  "meta": {
+    "timestamp": 1793066400,
+    "items_page_size": 16,
+    "items_page": 1,
+    "items_page_total": 1,
+    "items_total": 16
+  },
+  "items": [
+    {
+      "standardofcare": {
+        "id": "7001",
+        "animal_id": "1201",
+        "animal_uid": "A-1201",
+        "soc_group": {
+          "id": "21",
+          "name": "C5 Vaccination"
+        },
+        "last_fulfilled_at": 1768352400,
+        "due_at": 1799888400,
+        "modified_at": 1793066400
+      }
+    },
+    {
+      "standardofcare": {
+        "id": "7002",
+        "animal_id": "1201",
+        "animal_uid": "A-1201",
+        "soc_group": {
+          "id": "22",
+          "name": "Senior Screening"
+        },
+        "last_fulfilled_at": 1759712400,
+        "due_at": 1791248400,
+        "modified_at": 1793066400
+      }
+    },
+    {
+      "standardofcare": {
+        "id": "7003",
+        "animal_id": "1201",
+        "animal_uid": "A-1201",
+        "soc_group": {
+          "id": "23",
+          "name": "Heartworm"
+        },
+        "last_fulfilled_at": 1782784800,
+        "due_at": 1814320800,
+        "modified_at": 1793066400
+      }
+    },
+    {
+      "standardofcare": {
+        "id": "7004",
+        "animal_id": "1202",
+        "animal_uid": "A-1202",
+        "soc_group": {
+          "id": "24",
+          "name": "F3 Vaccination"
+        },
+        "last_fulfilled_at": 1772326800,
+        "due_at": 1803862800,
+        "modified_at": 1793066400
+      }
+    },
+    {
+      "standardofcare": {
+        "id": "7005",
+        "animal_id": "1202",
+        "animal_uid": "A-1202",
+        "soc_group": {
+          "id": "22",
+          "name": "Senior Screening"
+        },
+        "last_fulfilled_at": 1772326800,
+        "due_at": 1803862800,
+        "modified_at": 1793066400
+      }
+    },
+    {
+      "standardofcare": {
+        "id": "7006",
+        "animal_id": "1202",
+        "animal_uid": "A-1202",
+        "soc_group": {
+          "id": "25",
+          "name": "Dental Procedure"
+        },
+        "last_fulfilled_at": null,
+        "due_at": 1787882400,
+        "modified_at": 1793066400
+      }
+    },
+    {
+      "standardofcare": {
+        "id": "7007",
+        "animal_id": "1203",
+        "animal_uid": "A-1203",
+        "soc_group": {
+          "id": "24",
+          "name": "F3 Vaccination"
+        },
+        "last_fulfilled_at": 1757642400,
+        "due_at": 1789178400,
+        "modified_at": 1793066400
+      }
+    },
+    {
+      "standardofcare": {
+        "id": "7008",
+        "animal_id": "1204",
+        "animal_uid": "A-1204",
+        "soc_group": {
+          "id": "21",
+          "name": "C5 Vaccination"
+        },
+        "last_fulfilled_at": 1777600800,
+        "due_at": 1809136800,
+        "modified_at": 1793066400
+      }
+    },
+    {
+      "standardofcare": {
+        "id": "7009",
+        "animal_id": "1204",
+        "animal_uid": "A-1204",
+        "soc_group": {
+          "id": "26",
+          "name": "Flea and Tick"
+        },
+        "last_fulfilled_at": 1782698400,
+        "due_at": 1790474400,
+        "modified_at": 1793066400
+      }
+    },
+    {
+      "standardofcare": {
+        "id": "7010",
+        "animal_id": "1205",
+        "animal_uid": "A-1205",
+        "soc_group": {
+          "id": "21",
+          "name": "C5 Vaccination"
+        },
+        "last_fulfilled_at": 1775786400,
+        "due_at": 1807322400,
+        "modified_at": 1793066400
+      }
+    },
+    {
+      "standardofcare": {
+        "id": "7011",
+        "animal_id": "1205",
+        "animal_uid": "A-1205",
+        "soc_group": {
+          "id": "23",
+          "name": "Heartworm"
+        },
+        "last_fulfilled_at": 1762045200,
+        "due_at": 1793581200,
+        "modified_at": 1793066400
+      }
+    },
+    {
+      "standardofcare": {
+        "id": "7012",
+        "animal_id": "1206",
+        "animal_uid": "A-1206",
+        "soc_group": {
+          "id": "21",
+          "name": "C5 Vaccination"
+        },
+        "last_fulfilled_at": 1761786000,
+        "due_at": 1793322000,
+        "modified_at": 1793066400
+      }
+    },
+    {
+      "standardofcare": {
+        "id": "7013",
+        "animal_id": "1207",
+        "animal_uid": "A-1207",
+        "soc_group": {
+          "id": "21",
+          "name": "C5 Vaccination"
+        },
+        "last_fulfilled_at": 1771549200,
+        "due_at": 1803085200,
+        "modified_at": 1793066400
+      }
+    },
+    {
+      "standardofcare": {
+        "id": "7014",
+        "animal_id": "1208",
+        "animal_uid": "A-1208",
+        "soc_group": {
+          "id": "24",
+          "name": "F3 Vaccination"
+        },
+        "last_fulfilled_at": 1780279200,
+        "due_at": 1811815200,
+        "modified_at": 1793066400
+      }
+    },
+    {
+      "standardofcare": {
+        "id": "7015",
+        "animal_id": "1208",
+        "animal_uid": "A-1208",
+        "soc_group": {
+          "id": "27",
+          "name": "Intestinal Worming"
+        },
+        "last_fulfilled_at": 1783821600,
+        "due_at": 1791594000,
+        "modified_at": 1793066400
+      }
+    },
+    {
+      "standardofcare": {
+        "id": "7016",
+        "animal_id": "1209",
+        "animal_uid": "A-1209",
+        "soc_group": {
+          "id": "21",
+          "name": "C5 Vaccination"
+        },
+        "last_fulfilled_at": 1740877200,
+        "due_at": 1772413200,
+        "modified_at": 1793066400
+      }
+    }
+  ]
+}

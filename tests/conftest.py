@@ -6,16 +6,17 @@ from fastapi.testclient import TestClient
 from vetagent.agent.llm import ScriptedModel
 from vetagent.agent.tools import ToolContext
 from vetagent.api.app import create_app
+from vetagent.api.wiring import DEMO_OWNER_ID, DEMO_PET_ID
 from vetagent.config import Settings
-from vetagent.integrations.practice import SeedPracticeSystem
+from vetagent.integrations.ezyvet import EzyVetPracticeSystem
 from vetagent.store.sqlite import Store
 
 TODAY = date(2026, 10, 27)
 
 
 @pytest.fixture
-def practice() -> SeedPracticeSystem:
-    return SeedPracticeSystem()
+def practice() -> EzyVetPracticeSystem:
+    return EzyVetPracticeSystem()
 
 
 @pytest.fixture
@@ -25,7 +26,7 @@ def store() -> Store:
 
 @pytest.fixture
 def ctx(practice, store) -> ToolContext:
-    return ToolContext("o1", "p1", practice, store, TODAY)
+    return ToolContext(DEMO_OWNER_ID, DEMO_PET_ID, practice, store, TODAY)
 
 
 @pytest.fixture

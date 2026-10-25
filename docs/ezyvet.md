@@ -1,9 +1,28 @@
 # ezyVet: data mapping and API access
 
-The demo doesn't call ezyVet. `SeedPracticeSystem` reads `data/seed_clinic.json`, which is in the
-app's own shape: string IDs, ISO dates, and one flat list of care events. This page records where
-each seed field would come from in ezyVet. It also lists the gaps a real adapter must handle, and
-explains how to get API access.
+The demo doesn't call ezyVet, but its data is shaped like ezyVet's. `data/ezyvet/` holds one saved
+list response per endpoint (`v1_animal.json`, `v2_standardofcare.json`, ...), and
+`EzyVetPracticeSystem` maps them to the app's models exactly as it would map live responses. The
+clinic, owners and pets are fictional. This page records where each field comes from, the gaps a
+real adapter must handle, and how to get API access.
+
+## Demo data shape
+
+| Shape | Status | Source |
+| --- | --- | --- |
+| List envelope `{"meta": {..., "items_page_total"}, "items": [{"animal": {...}}]}` | Confirmed | ezyVet docs; DoveLewis' open-source ezyVetCLI pages on `meta.items_page_total` |
+| Animal: `contact_id`, `species_id`, `breed_id`, `sex_id`, `is_dead`, `date_of_birth`, `microchip_number` | Confirmed | ezyVet animal schema |
+| Animal: `death` omitted for living animals | Confirmed | Release notes, v45.5 |
+| Contact: `first_name`, `last_name`; numeric IDs, often sent as strings | Confirmed | Contact docs |
+| Standard of care: `animal_id`, `animal_uid`, `soc_group {id, name}`, `last_fulfilled_at`, `due_at`, `modified_at` | Confirmed | Standard of Care guide |
+| Timestamps as epoch seconds | Confirmed | Standard of Care guide, contact `date_of_birth` |
+| Wellness membership `status` values (Active, Paused, Cancelled, ...) | Confirmed | Membership status help page |
+| Health status `weight` + `created_at`; consult `date` + `description`; product `price`; wellness plan `price`; membership `start_date`; invoice line `total` + `wellness_plan_membership_id` | **Assumed** | Field names not published. Check them against the Postman collection and fix the mapping in `integrations/ezyvet.py` |
+
+`clinic_config.json` is not ezyVet data. It holds what each clinic confirms at onboarding: its
+timezone, lead vet, which product prices each care type, which standard-of-care groups are which
+care type, and what each wellness plan covers. Dates are read in the clinic's timezone. The demo
+includes one deceased patient (Max) and one cancelled membership to check they're ignored (CL-6).
 
 Sources are ezyVet's public developer and help pages, checked October 2026. Each mapping row is
 rated **Confirmed** (documented by ezyVet), **Likely** (follows ezyVet's documented `/v1/{resource}`
@@ -24,22 +43,22 @@ you get after approval.
 
 ## Field mapping
 
-| Seed field | ezyVet source | Status | Notes for the adapter |
+| App field | ezyVet source | Status | Notes for the adapter |
 | --- | --- | --- | --- |
 | `clinic.name` | Site / separation name | Likely | One database can hold several sites. |
 | `clinic.lead_vet` | `v1/user` | Likely | ezyVet doesn't have a "lead vet". Pick one per clinic in config, or use the animal's last consulting vet. |
 | `price_list.*` | `v1/product` (price) | Likely | Each key (`vaccination`, `heartworm`, ...) is **App** config that points at one product ID. |
-| `owners[].id`, `name` | `v1/contact` (`id`, `first_name`, `last_name`) | Likely | The seed holds one display name, for example "Priya S."; build it from first and last name. |
+| `owners[].id`, `name` | `v1/contact` (`id`, `first_name`, `last_name`) | Likely | Shown as "Priya S.", built from first and last name. |
 | `pets[].id`, `name` | `v1/animal` | Confirmed | |
 | `pets[].owner_id` | `v1/animal.contact_id` | Confirmed | |
 | `pets[].birth_date` | `v1/animal.date_of_birth` | Confirmed | May be an estimate (`is_estimated_birth`-style flag). |
 | `pets[].species`, `breed` | `v1/animal` `species_id`, `breed_id` -> `v1/species`, `v1/breed` | Likely | IDs, not text. Map species to `dog` or `cat` and skip other species, since care rules only cover dogs and cats. |
-| *(missing)* deceased / inactive | `v1/animal.date_of_death`, active flag | Confirmed | **Gap.** The seed has no deceased pets, so nothing filters them. A real adapter must leave them out, or the clinic will remind owners about a pet that has died. |
+| deceased / inactive | `v1/animal` `is_dead`, `active` | Confirmed | Filtered out by the adapter (CL-6). |
 | `events[type=vaccination]` | `v2/standardofcare` (`last_fulfilled_at`, `due_at`) or vaccination records | Confirmed (SoC) | ezyVet works out due dates from its Standard of Care setup, so its `due_at` can replace our 365-day rule (CG-1). |
-| `events[type=parasite]`, `repeat_days` | `v2/standardofcare` (care group such as "Flea and Tick", `due_at`) | Confirmed | `repeat_days` is the seed's stand-in for the clinic's SoC interval. Prefer `due_at`. |
+| `events[type=parasite]`, `repeat_days` | `v2/standardofcare` (care group such as "Flea and Tick", `due_at`) | Confirmed | `repeat_days` is worked out from `last_fulfilled_at` to `due_at`. |
 | `events[type=screening]` | SoC care group, or invoice lines for a screening product | Likely | Depends on how each clinic sets up SoC. |
 | `events[type=consult]`, `detail` | `v1/consult` + clinical records / history | Likely | Free text. Treat it as clinical data (the agent may quote it, never interpret it). |
-| `events[type=finding]`, `finding=dental_recommended` | Clinical records (free text) | **App** | **Gap.** ezyVet has no structured "dental recommended" flag. Use a SoC care group, a clinic-specific presenting problem / diagnosis code, or a dental product quoted but not invoiced. Agree this with each pilot clinic. |
+| `events[type=finding]`, `finding=dental_recommended` | `v2/standardofcare` group the clinic marks as `dental` | **App** | ezyVet has no structured "dental recommended" flag. The demo treats a due dental care group with no later procedure as the finding. Agree this with each pilot clinic. |
 | `events[type=dental]` | Invoice lines for dental products | Likely | |
 | `events[type=weight]`, `kg` | `v1/healthstatus.weight` | Confirmed | `healthstatus` also supports POST, which would allow writing shared home weights back. That needs a write scope and partner terms that allow it. |
 | `plans[]` | `v2/wellnessplan` | Confirmed (endpoint) | Field names not checked. `covers` (which gap types a plan includes) is **App** config. |
@@ -49,7 +68,7 @@ you get after approval.
 
 In short: every record the demo uses has an ezyVet source. Three things don't come straight from
 ezyVet and need a decision per clinic: the dental finding, the `price_key` / `covers` config, and
-the lead vet. The seed is also missing the deceased flag, which real data will need.
+the lead vet. All three live in `clinic_config.json`.
 
 ## Other constraints to know before applying
 

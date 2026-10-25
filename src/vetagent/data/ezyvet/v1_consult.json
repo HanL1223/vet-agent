@@ -1,0 +1,20 @@
+{
+  "meta": {
+    "timestamp": 1793066400,
+    "items_page_size": 1,
+    "items_page": 1,
+    "items_page_total": 1,
+    "items_total": 1
+  },
+  "items": [
+    {
+      "consult": {
+        "id": "8801",
+        "animal_id": "1201",
+        "date": 1786672800,
+        "user_id": "12",
+        "description": "Mild strain in the front left leg. Rest for a week, short lead walks, recheck if still limping."
+      }
+    }
+  ]
+}

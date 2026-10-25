@@ -1,0 +1,29 @@
+{
+  "meta": {
+    "timestamp": 1793066400,
+    "items_page_size": 2,
+    "items_page": 1,
+    "items_page_total": 1,
+    "items_total": 2
+  },
+  "items": [
+    {
+      "user": {
+        "id": "12",
+        "active": true,
+        "first_name": "Grace",
+        "last_name": "Lee",
+        "title": "Dr"
+      }
+    },
+    {
+      "user": {
+        "id": "14",
+        "active": true,
+        "first_name": "Sam",
+        "last_name": "Patel",
+        "title": "Dr"
+      }
+    }
+  ]
+}

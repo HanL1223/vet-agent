@@ -11,6 +11,7 @@ Scope of the demo. Each requirement has an ID; code and tests reference these ID
 | CL-3 | Filter care gaps by type: vaccination, parasite, senior screening, dental. |
 | CL-4 | Send a reminder for one gap, or for all gaps shown. A sent reminder is recorded and shown. |
 | CL-5 | Show the clinic's care plans with price, benefits and member count. |
+| CL-6 | Deceased or inactive patients are left out of every list, count and reminder. |
 
 ## Care-gap rules (shared engine)
 

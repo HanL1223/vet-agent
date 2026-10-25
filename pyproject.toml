@@ -10,6 +10,7 @@ dependencies = [
     "anthropic>=0.40",
     "python-dotenv>=1.0",
     "openai>=3.37.0",
+    "tzdata>=2026.5",
 ]
 
 [project.scripts]
@@ -30,7 +31,7 @@ build-backend = "setuptools.build_meta"
 where = ["src"]
 
 [tool.setuptools.package-data]
-vetagent = ["web/*", "data/*.json"]
+vetagent = ["web/*", "data/ezyvet/*.json"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

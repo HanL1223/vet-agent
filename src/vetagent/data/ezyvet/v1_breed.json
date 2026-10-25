@@ -1,0 +1,74 @@
+{
+  "meta": {
+    "timestamp": 1793066400,
+    "items_page_size": 9,
+    "items_page": 1,
+    "items_page_total": 1,
+    "items_total": 9
+  },
+  "items": [
+    {
+      "breed": {
+        "id": "41",
+        "name": "Burmese",
+        "species_id": "2"
+      }
+    },
+    {
+      "breed": {
+        "id": "42",
+        "name": "Domestic shorthair",
+        "species_id": "2"
+      }
+    },
+    {
+      "breed": {
+        "id": "43",
+        "name": "Ragdoll",
+        "species_id": "2"
+      }
+    },
+    {
+      "breed": {
+        "id": "44",
+        "name": "Border collie",
+        "species_id": "1"
+      }
+    },
+    {
+      "breed": {
+        "id": "45",
+        "name": "Cavoodle",
+        "species_id": "1"
+      }
+    },
+    {
+      "breed": {
+        "id": "46",
+        "name": "Golden retriever",
+        "species_id": "1"
+      }
+    },
+    {
+      "breed": {
+        "id": "47",
+        "name": "Kelpie",
+        "species_id": "1"
+      }
+    },
+    {
+      "breed": {
+        "id": "48",
+        "name": "Labrador",
+        "species_id": "1"
+      }
+    },
+    {
+      "breed": {
+        "id": "49",
+        "name": "Staffordshire terrier",
+        "species_id": "1"
+      }
+    }
+  ]
+}

@@ -1,0 +1,23 @@
+{
+  "meta": {
+    "timestamp": 1793066400,
+    "items_page_size": 2,
+    "items_page": 1,
+    "items_page_total": 1,
+    "items_total": 2
+  },
+  "items": [
+    {
+      "species": {
+        "id": "1",
+        "name": "Canine"
+      }
+    },
+    {
+      "species": {
+        "id": "2",
+        "name": "Feline"
+      }
+    }
+  ]
+}

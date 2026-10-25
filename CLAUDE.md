@@ -40,13 +40,15 @@ set the key in `.env` to use that model through the same loop and tools.
 web/ (static HTML/JS) -> api/ (FastAPI routes) -> services/ (use cases)
                                                    |-> agent/ (loop, tools, safety, model adapters)
                                                    |-> domain/ (pure rules: care gaps, plan value)
-                                                   |-> integrations/ (PracticeSystem port + seed adapter)
+                                                   |-> integrations/ (PracticeSystem port + ezyVet adapter)
                                                    |-> store/ (SQLite for app-owned data)
 ```
 
 - `domain/` is pure: no I/O, no framework imports. Put business rules here and unit-test them.
-- `integrations/practice.py` defines the `PracticeSystem` protocol. `SeedPracticeSystem` reads
-  `data/seed_clinic.json`. A real ezyVet adapter must implement the same protocol; nothing else changes.
+- `integrations/practice.py` defines the `PracticeSystem` protocol. `EzyVetPracticeSystem`
+  (`integrations/ezyvet.py`) implements it by mapping ezyVet API records to domain models. The demo
+  reads saved ezyVet list responses from `data/ezyvet/` (fictional clinic) through `FileSource`.
+  `data/ezyvet/clinic_config.json` holds per-clinic settings ezyVet doesn't know.
 - `store/sqlite.py` holds only data the app owns (chat, proposals, requests, weights, consent,
   reminders). Never copy clinic records into it (PR-3).
 - `api/wiring.py` is the only place dependencies are chosen. Swap adapters there.
@@ -73,8 +75,8 @@ web/ (static HTML/JS) -> api/ (FastAPI routes) -> services/ (use cases)
   renderer in `web/owner.js` if it returns a card, teach `ScriptedModel` an intent if the offline
   demo should use it, and add a test.
 - **New card type**: one function in the `CARDS` map in `web/owner.js`. Follow `docs/design.md`.
-- **Real ezyVet**: new class in `integrations/` implementing `PracticeSystem`, chosen in
-  `api/wiring.py`. Respect 60 calls/min per endpoint and 180/min per database; cache reads.
+- **Real ezyVet**: a live `EzyVetSource` (OAuth, paging) in `integrations/ezyvet.py`, passed to
+  `EzyVetPracticeSystem` in `api/wiring.py`. Demo data changes go in `data/ezyvet/` in the same shape. Respect 60 calls/min per endpoint and 180/min per database; cache reads.
 
 ## Conventions
 

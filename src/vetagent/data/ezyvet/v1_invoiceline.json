@@ -1,0 +1,61 @@
+{
+  "meta": {
+    "timestamp": 1793066400,
+    "items_page_size": 5,
+    "items_page": 1,
+    "items_page_total": 1,
+    "items_total": 5
+  },
+  "items": [
+    {
+      "invoiceline": {
+        "id": "60001",
+        "animal_id": "1201",
+        "name": "C5 vaccine and health check",
+        "total": "120.00",
+        "created_at": 1768352400,
+        "wellness_plan_membership_id": "41"
+      }
+    },
+    {
+      "invoiceline": {
+        "id": "60002",
+        "animal_id": "1201",
+        "name": "Heartworm injection",
+        "total": "160.00",
+        "created_at": 1782784800,
+        "wellness_plan_membership_id": "41"
+      }
+    },
+    {
+      "invoiceline": {
+        "id": "60003",
+        "animal_id": "1201",
+        "name": "Consult: front leg strain",
+        "total": "92.00",
+        "created_at": 1786672800,
+        "wellness_plan_membership_id": "41"
+      }
+    },
+    {
+      "invoiceline": {
+        "id": "60004",
+        "animal_id": "1201",
+        "name": "Parasite treatment deliveries",
+        "total": "40.00",
+        "created_at": 1788228000,
+        "wellness_plan_membership_id": "41"
+      }
+    },
+    {
+      "invoiceline": {
+        "id": "60005",
+        "animal_id": "1203",
+        "name": "Consultation, standard",
+        "total": "92.00",
+        "created_at": 1757642400,
+        "wellness_plan_membership_id": null
+      }
+    }
+  ]
+}

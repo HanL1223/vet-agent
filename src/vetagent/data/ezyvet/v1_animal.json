@@ -1,0 +1,168 @@
+{
+  "meta": {
+    "timestamp": 1793066400,
+    "items_page_size": 9,
+    "items_page": 1,
+    "items_page_total": 1,
+    "items_total": 9
+  },
+  "items": [
+    {
+      "animal": {
+        "id": "1201",
+        "active": true,
+        "name": "Biscuit",
+        "contact_id": "501",
+        "species_id": "1",
+        "breed_id": "48",
+        "sex_id": "2",
+        "date_of_birth": 1496368800,
+        "is_estimated_birth": false,
+        "is_dead": false,
+        "microchip_number": "956000012014821",
+        "created_at": 1548982800,
+        "modified_at": 1788228000
+      }
+    },
+    {
+      "animal": {
+        "id": "1202",
+        "active": true,
+        "name": "Pepper",
+        "contact_id": "502",
+        "species_id": "2",
+        "breed_id": "43",
+        "sex_id": "4",
+        "date_of_birth": 1428631200,
+        "is_estimated_birth": false,
+        "is_dead": false,
+        "microchip_number": "956000012024821",
+        "created_at": 1548982800,
+        "modified_at": 1788228000
+      }
+    },
+    {
+      "animal": {
+        "id": "1203",
+        "active": true,
+        "name": "Miso",
+        "contact_id": "503",
+        "species_id": "2",
+        "breed_id": "42",
+        "sex_id": "2",
+        "date_of_birth": 1682906400,
+        "is_estimated_birth": false,
+        "is_dead": false,
+        "microchip_number": "956000012034821",
+        "created_at": 1548982800,
+        "modified_at": 1788228000
+      }
+    },
+    {
+      "animal": {
+        "id": "1204",
+        "active": true,
+        "name": "Luna",
+        "contact_id": "504",
+        "species_id": "1",
+        "breed_id": "45",
+        "sex_id": "4",
+        "date_of_birth": 1614733200,
+        "is_estimated_birth": false,
+        "is_dead": false,
+        "microchip_number": "956000012044821",
+        "created_at": 1548982800,
+        "modified_at": 1788228000
+      }
+    },
+    {
+      "animal": {
+        "id": "1205",
+        "active": true,
+        "name": "Rocket",
+        "contact_id": "505",
+        "species_id": "1",
+        "breed_id": "47",
+        "sex_id": "2",
+        "date_of_birth": 1706835600,
+        "is_estimated_birth": false,
+        "is_dead": false,
+        "microchip_number": "956000012054821",
+        "created_at": 1548982800,
+        "modified_at": 1788228000
+      }
+    },
+    {
+      "animal": {
+        "id": "1206",
+        "active": true,
+        "name": "Ollie",
+        "contact_id": "506",
+        "species_id": "1",
+        "breed_id": "49",
+        "sex_id": "2",
+        "date_of_birth": 1562464800,
+        "is_estimated_birth": false,
+        "is_dead": false,
+        "microchip_number": "956000012064821",
+        "created_at": 1548982800,
+        "modified_at": 1788228000
+      }
+    },
+    {
+      "animal": {
+        "id": "1207",
+        "active": true,
+        "name": "Nala",
+        "contact_id": "507",
+        "species_id": "1",
+        "breed_id": "46",
+        "sex_id": "4",
+        "date_of_birth": 1541466000,
+        "is_estimated_birth": false,
+        "is_dead": false,
+        "microchip_number": "956000012074821",
+        "created_at": 1548982800,
+        "modified_at": 1788228000
+      }
+    },
+    {
+      "animal": {
+        "id": "1208",
+        "active": true,
+        "name": "Coco",
+        "contact_id": "508",
+        "species_id": "2",
+        "breed_id": "41",
+        "sex_id": "4",
+        "date_of_birth": 1642640400,
+        "is_estimated_birth": false,
+        "is_dead": false,
+        "microchip_number": "956000012084821",
+        "created_at": 1548982800,
+        "modified_at": 1788228000
+      }
+    },
+    {
+      "animal": {
+        "id": "1209",
+        "active": false,
+        "name": "Max",
+        "contact_id": "509",
+        "species_id": "1",
+        "breed_id": "44",
+        "sex_id": "2",
+        "date_of_birth": 1300064400,
+        "is_estimated_birth": true,
+        "is_dead": true,
+        "death": {
+          "date": 1781748000,
+          "reason": "Euthanasia"
+        },
+        "microchip_number": "956000012094410",
+        "created_at": 1399082400,
+        "modified_at": 1781748000
+      }
+    }
+  ]
+}

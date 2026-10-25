@@ -57,13 +57,13 @@ The first run creates `.env` from `.env.example`. To use Claude, set `ANTHROPIC_
 ```
 src/vetagent/
   domain/        pure rules: care gaps, plan value
-  integrations/  PracticeSystem port + seed adapter (ezyVet mapping: docs/ezyvet.md)
+  integrations/  PracticeSystem port + ezyVet adapter (mapping: docs/ezyvet.md)
   store/         SQLite for app-owned data
   agent/         loop, tools, safety gate, prompts, model adapters
   services/      clinic dashboard + owner agent use cases
   api/           FastAPI routes and wiring
   web/           static pages (no framework, no build step)
-  data/          seed clinic data
+  data/ezyvet/   demo clinic as saved ezyVet API responses (fictional)
 docs/requirements.md   requirement IDs referenced by code and tests
 tests/                 pytest
 ```

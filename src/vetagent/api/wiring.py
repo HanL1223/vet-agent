@@ -4,14 +4,16 @@ from dataclasses import dataclass
 
 from vetagent.agent.llm import ClaudeModel, Model, OpenAIModel, ScriptedModel
 from vetagent.config import Settings
-from vetagent.integrations.practice import PracticeSystem, SeedPracticeSystem
+from vetagent.integrations.ezyvet import EzyVetPracticeSystem
+from vetagent.integrations.practice import PracticeSystem
 from vetagent.services.clinic import ClinicService
 from vetagent.services.owner_agent import OwnerAgentService
 from vetagent.store.sqlite import Store
 
 # The demo signs in as one owner with one pet. Real auth replaces these.
-DEMO_OWNER_ID = "o1"
-DEMO_PET_ID = "p1"
+# ezyVet contact and animal IDs from data/ezyvet/.
+DEMO_OWNER_ID = "501"
+DEMO_PET_ID = "1201"
 
 
 @dataclass(frozen=True)
@@ -25,7 +27,7 @@ def build_services(
     practice: PracticeSystem | None = None,
     model: Model | None = None,
 ) -> Services:
-    practice = practice or SeedPracticeSystem()
+    practice = practice or EzyVetPracticeSystem()
     store = Store(settings.db_path)
     model = model or choose_model(settings)
     return Services(
