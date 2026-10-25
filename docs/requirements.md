@@ -34,7 +34,7 @@ Scope of the demo. Each requirement has an ID; code and tests reference these ID
 | AG-5 | The owner can log a weight; it is shared with the clinic only if the owner's sharing consent is on. |
 | AG-6 | "Is my plan worth it?" shows benefits used against plan payments, honestly. |
 | AG-7 | Each agent reply lists what it did (tools used) so the owner can see its actions. |
-| AG-8 | The demo runs with no API key using an offline scripted model; with a key it uses Claude. |
+| AG-8 | The demo runs with no API key using an offline scripted model; with a key it uses Claude, or OpenAI when `VETAGENT_PROVIDER=openai`. |
 
 ## Consent and privacy
 

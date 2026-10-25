@@ -28,7 +28,7 @@ uv run vetagent         # http://localhost:8000
 ```
 
 The first run creates `.env` from `.env.example`. To use Claude, set `ANTHROPIC_API_KEY` in
-`.env` and restart.
+`.env` and restart. To use OpenAI instead, set `VETAGENT_PROVIDER=openai` and `OPENAI_API_KEY`.
 
 | Task | Command |
 | --- | --- |

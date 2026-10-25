@@ -2,7 +2,7 @@
 
 from dataclasses import dataclass
 
-from vetagent.agent.llm import ClaudeModel, Model, ScriptedModel
+from vetagent.agent.llm import ClaudeModel, Model, OpenAIModel, ScriptedModel
 from vetagent.config import Settings
 from vetagent.integrations.practice import PracticeSystem, SeedPracticeSystem
 from vetagent.services.clinic import ClinicService
@@ -27,15 +27,18 @@ def build_services(
 ) -> Services:
     practice = practice or SeedPracticeSystem()
     store = Store(settings.db_path)
-    if model is None:
-        model = (
-            ClaudeModel(settings.anthropic_api_key, settings.model)
-            if settings.use_claude
-            else ScriptedModel()
-        )
+    model = model or choose_model(settings)
     return Services(
         clinic=ClinicService(practice, store, settings.today),
         owner_agent=OwnerAgentService(
             practice, store, model, settings.today, DEMO_OWNER_ID, DEMO_PET_ID
         ),
     )
+
+
+def choose_model(settings: Settings) -> Model:
+    if not settings.api_key:
+        return ScriptedModel()
+    if settings.provider == "openai":
+        return OpenAIModel(settings.api_key, settings.model)
+    return ClaudeModel(settings.api_key, settings.model)

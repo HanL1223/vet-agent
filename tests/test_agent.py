@@ -1,6 +1,6 @@
 from datetime import date
 
-from vetagent.agent.llm import ModelReply, ScriptedModel, ToolCall, to_anthropic
+from vetagent.agent.llm import ModelReply, ScriptedModel, ToolCall, to_anthropic, to_openai
 from vetagent.agent.loop import MAX_STEPS, run_turn
 from vetagent.agent.safety import triage
 from vetagent.domain.plan_value import months_paid
@@ -68,3 +68,23 @@ def test_anthropic_format_merges_roles_and_starts_with_user():
     ]
     out = to_anthropic(messages)
     assert [m["role"] for m in out] == ["user", "assistant", "user", "assistant", "user"]
+
+
+def test_openai_format_keeps_tool_calls_and_drops_card_only_turns():
+    messages = [
+        {"role": "user", "text": "What's due?"},
+        {
+            "role": "assistant",
+            "text": "",
+            "tool_calls": [{"id": "1", "name": "list_care_due", "args": {"limit": 2}}],
+        },
+        {"role": "tool", "tool_call_id": "1", "name": "list_care_due", "result": {"ok": True}},
+        {"role": "assistant", "text": "", "cards": []},
+        {"role": "assistant", "text": "Done"},
+    ]
+    out = to_openai(messages)
+    assert [m["role"] for m in out] == ["user", "assistant", "tool", "assistant"]
+    call = out[1]["tool_calls"][0]
+    assert out[1]["content"] is None
+    assert call["function"] == {"name": "list_care_due", "arguments": '{"limit": 2}'}
+    assert out[2] == {"role": "tool", "tool_call_id": "1", "content": '{"ok": true}'}

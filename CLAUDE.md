@@ -30,8 +30,9 @@ uv add <package> / uv add --dev <pkg>    # dependencies (updates uv.lock; commit
 
 Use `pathlib` for paths and avoid `%-d`-style strftime codes (not supported on Windows).
 
-No API key needed: with `ANTHROPIC_API_KEY` empty the agent uses `ScriptedModel` (offline).
-Set the key in `.env` to use Claude through the same loop and tools.
+No API key needed: with the provider's key empty the agent uses `ScriptedModel` (offline).
+`VETAGENT_PROVIDER` picks `anthropic` (default, `ANTHROPIC_API_KEY`) or `openai` (`OPENAI_API_KEY`);
+set the key in `.env` to use that model through the same loop and tools.
 
 ## Architecture (dependencies point inwards)
 
@@ -60,7 +61,7 @@ web/ (static HTML/JS) -> api/ (FastAPI routes) -> services/ (use cases)
   `card` goes to the UI. `trace` text feeds "What I did" (AG-7).
 - Tools that contact the clinic only create a **proposal**. Only `OwnerAgentService.confirm`
   sends anything to the clinic (AG-4). Keep it that way.
-- `agent/llm.py`: `Model` protocol, `ClaudeModel`, `ScriptedModel`. Messages are stored in a
+- `agent/llm.py`: `Model` protocol, `ClaudeModel`, `OpenAIModel`, `ScriptedModel`. Messages are stored in a
   provider-neutral format (see `agent/__init__.py`); adapters translate.
 - `agent/prompts.py`: system prompt. The agent is not a vet: no diagnosis, no medicines or doses.
 
