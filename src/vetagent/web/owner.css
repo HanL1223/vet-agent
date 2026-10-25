@@ -215,3 +215,9 @@ a.btn:not(.ghost) { color: #fff; }
 @media (min-width: 901px) {
   .layout { height: calc(100vh - 65px); }
 }
+
+/* Near you: open-data notices (OD-3, OD-5). A ruled left edge, no fill, like a margin note. */
+.notice { display: grid; gap: 4px; padding-left: 12px; border-left: 2px solid var(--sage); }
+.notice + .notice { margin-top: 6px; }
+.notice.heat { border-left-color: var(--clay); }
+.notice p { margin: 0; }

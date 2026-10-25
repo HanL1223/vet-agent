@@ -1,7 +1,7 @@
 {
   "_about": "App-owned settings for one clinic. Not ezyVet data: the clinic confirms these at onboarding.",
   "clinic_name": "Northside Family Vets",
-  "timezone": "Australia/Sydney",
+  "timezone": "Australia/Brisbane",
   "lead_vet_user_id": "12",
   "species": {
     "Canine": "dog",
@@ -73,9 +73,9 @@
     "9": "senior"
   },
   "contact": {
-    "phone": "02 5550 0101",
-    "emergency_name": "Northside Animal Emergency (24 hours)",
-    "emergency_phone": "02 5550 0199"
+    "phone": "07 5550 0101",
+    "emergency_name": "Northside after-hours line",
+    "emergency_phone": "07 5550 0199"
   },
   "payment_options": [
     "Pay at the clinic",
@@ -109,5 +109,35 @@
       "dog",
       "cat"
     ]
+  },
+  "open_data": {
+    "_about": "Where the clinic is, for the open data in data/open/ (docs/open-data.md). The demo clinic is fictional; Kirwan, Townsville is real.",
+    "suburb": "Kirwan",
+    "state": "Queensland",
+    "lat": -19.3,
+    "lon": 146.73,
+    "catchment_suburbs": [
+      "Kirwan",
+      "Thuringowa Central",
+      "Condon",
+      "Rasmussen",
+      "Kelso",
+      "Mount Louisa",
+      "Cranbrook",
+      "Heatley",
+      "Gulliver",
+      "Vincent",
+      "Aitkenvale",
+      "Annandale",
+      "Douglas",
+      "Mundingburra"
+    ],
+    "tick_radius_km": 100,
+    "vet_radius_km": 30,
+    "apvma": {
+      "302": "68870",
+      "303": "51805",
+      "306": "35824"
+    }
   }
 }

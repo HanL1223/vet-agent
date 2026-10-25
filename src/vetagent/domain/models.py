@@ -47,6 +47,7 @@ class CareEvent:
     price_key: str | None = None
     finding: str | None = None
     kg: float | None = None
+    product_id: str | None = None  # the clinic's product, for dispensed lines (OD-2)
 
 
 @dataclass(frozen=True)
@@ -94,3 +95,4 @@ class ClinicContact:
     phone: str
     emergency_name: str  # the after-hours partner the clinic sends owners to
     emergency_phone: str
+    emergency_source: str = ""  # attribution when the number comes from open data (OD-4)

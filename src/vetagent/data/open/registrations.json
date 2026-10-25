@@ -1,0 +1,662 @@
+{
+ "_source": {
+  "source": "Animal Registrations October 2026",
+  "url": "https://data.gov.au/data/dataset/6d43565d-51a9-4e66-aef4-6bdb7b2abb9d/resource/7417864a-20d9-4fdc-a8be-33d7deb46e68/download/animal-registrations-october-2026.xlsx",
+  "publisher": "Townsville City Council",
+  "licence": "CC BY 4.0",
+  "fetched": "2026-10-25"
+ },
+ "suburbs": [
+  {
+   "suburb": "Aitkenvale",
+   "dogs": 500,
+   "dogs_desexed": 425,
+   "cats": 113,
+   "cats_desexed": 101
+  },
+  {
+   "suburb": "Alice River",
+   "dogs": 462,
+   "dogs_desexed": 399,
+   "cats": 60,
+   "cats_desexed": 48
+  },
+  {
+   "suburb": "Alligator Creek",
+   "dogs": 254,
+   "dogs_desexed": 210,
+   "cats": 23,
+   "cats_desexed": 19
+  },
+  {
+   "suburb": "Annandale",
+   "dogs": 1000,
+   "dogs_desexed": 887,
+   "cats": 181,
+   "cats_desexed": 162
+  },
+  {
+   "suburb": "Arcadia",
+   "dogs": 26,
+   "dogs_desexed": 22,
+   "cats": 3,
+   "cats_desexed": 3
+  },
+  {
+   "suburb": "Balgal Beach",
+   "dogs": 174,
+   "dogs_desexed": 153,
+   "cats": 17,
+   "cats_desexed": 16
+  },
+  {
+   "suburb": "Barringha",
+   "dogs": 5,
+   "dogs_desexed": 3,
+   "cats": 0,
+   "cats_desexed": 0
+  },
+  {
+   "suburb": "Beach Holm",
+   "dogs": 4,
+   "dogs_desexed": 4,
+   "cats": 0,
+   "cats_desexed": 0
+  },
+  {
+   "suburb": "Belgian Gardens",
+   "dogs": 239,
+   "dogs_desexed": 200,
+   "cats": 56,
+   "cats_desexed": 55
+  },
+  {
+   "suburb": "Black River",
+   "dogs": 210,
+   "dogs_desexed": 174,
+   "cats": 24,
+   "cats_desexed": 23
+  },
+  {
+   "suburb": "Bluewater",
+   "dogs": 131,
+   "dogs_desexed": 103,
+   "cats": 22,
+   "cats_desexed": 18
+  },
+  {
+   "suburb": "Bluewater Park",
+   "dogs": 171,
+   "dogs_desexed": 143,
+   "cats": 26,
+   "cats_desexed": 23
+  },
+  {
+   "suburb": "Bohle",
+   "dogs": 12,
+   "dogs_desexed": 6,
+   "cats": 1,
+   "cats_desexed": 1
+  },
+  {
+   "suburb": "Bohle Plains",
+   "dogs": 489,
+   "dogs_desexed": 416,
+   "cats": 109,
+   "cats_desexed": 99
+  },
+  {
+   "suburb": "Brookhill",
+   "dogs": 7,
+   "dogs_desexed": 6,
+   "cats": 1,
+   "cats_desexed": 1
+  },
+  {
+   "suburb": "Burdell",
+   "dogs": 830,
+   "dogs_desexed": 679,
+   "cats": 171,
+   "cats_desexed": 161
+  },
+  {
+   "suburb": "Bushland Beach",
+   "dogs": 816,
+   "dogs_desexed": 711,
+   "cats": 129,
+   "cats_desexed": 112
+  },
+  {
+   "suburb": "Calcium",
+   "dogs": 2,
+   "dogs_desexed": 2,
+   "cats": 0,
+   "cats_desexed": 0
+  },
+  {
+   "suburb": "Cape Cleveland",
+   "dogs": 10,
+   "dogs_desexed": 10,
+   "cats": 0,
+   "cats_desexed": 0
+  },
+  {
+   "suburb": "Castle Hill",
+   "dogs": 128,
+   "dogs_desexed": 107,
+   "cats": 21,
+   "cats_desexed": 14
+  },
+  {
+   "suburb": "Clemant",
+   "dogs": 1,
+   "dogs_desexed": 1,
+   "cats": 0,
+   "cats_desexed": 0
+  },
+  {
+   "suburb": "Cluden",
+   "dogs": 70,
+   "dogs_desexed": 65,
+   "cats": 5,
+   "cats_desexed": 3
+  },
+  {
+   "suburb": "Condon",
+   "dogs": 674,
+   "dogs_desexed": 584,
+   "cats": 119,
+   "cats_desexed": 102
+  },
+  {
+   "suburb": "Cosgrove",
+   "dogs": 83,
+   "dogs_desexed": 66,
+   "cats": 19,
+   "cats_desexed": 17
+  },
+  {
+   "suburb": "Cranbrook",
+   "dogs": 644,
+   "dogs_desexed": 565,
+   "cats": 126,
+   "cats_desexed": 112
+  },
+  {
+   "suburb": "Cungulla",
+   "dogs": 62,
+   "dogs_desexed": 49,
+   "cats": 1,
+   "cats_desexed": 1
+  },
+  {
+   "suburb": "Currajong",
+   "dogs": 305,
+   "dogs_desexed": 261,
+   "cats": 47,
+   "cats_desexed": 41
+  },
+  {
+   "suburb": "Deeragun",
+   "dogs": 535,
+   "dogs_desexed": 453,
+   "cats": 77,
+   "cats_desexed": 72
+  },
+  {
+   "suburb": "Douglas",
+   "dogs": 663,
+   "dogs_desexed": 583,
+   "cats": 142,
+   "cats_desexed": 126
+  },
+  {
+   "suburb": "Garbutt",
+   "dogs": 256,
+   "dogs_desexed": 217,
+   "cats": 63,
+   "cats_desexed": 54
+  },
+  {
+   "suburb": "Gulliver",
+   "dogs": 420,
+   "dogs_desexed": 365,
+   "cats": 84,
+   "cats_desexed": 72
+  },
+  {
+   "suburb": "Gumlow",
+   "dogs": 8,
+   "dogs_desexed": 8,
+   "cats": 2,
+   "cats_desexed": 2
+  },
+  {
+   "suburb": "Heatley",
+   "dogs": 470,
+   "dogs_desexed": 393,
+   "cats": 101,
+   "cats_desexed": 90
+  },
+  {
+   "suburb": "Hermit Park",
+   "dogs": 355,
+   "dogs_desexed": 312,
+   "cats": 81,
+   "cats_desexed": 74
+  },
+  {
+   "suburb": "Hervey Range",
+   "dogs": 6,
+   "dogs_desexed": 3,
+   "cats": 0,
+   "cats_desexed": 0
+  },
+  {
+   "suburb": "Horseshoe Bay",
+   "dogs": 73,
+   "dogs_desexed": 62,
+   "cats": 17,
+   "cats_desexed": 17
+  },
+  {
+   "suburb": "Hyde Park",
+   "dogs": 159,
+   "dogs_desexed": 144,
+   "cats": 34,
+   "cats_desexed": 30
+  },
+  {
+   "suburb": "Idalia",
+   "dogs": 490,
+   "dogs_desexed": 419,
+   "cats": 74,
+   "cats_desexed": 65
+  },
+  {
+   "suburb": "Jensen",
+   "dogs": 319,
+   "dogs_desexed": 273,
+   "cats": 35,
+   "cats_desexed": 32
+  },
+  {
+   "suburb": "Julago",
+   "dogs": 102,
+   "dogs_desexed": 94,
+   "cats": 24,
+   "cats_desexed": 21
+  },
+  {
+   "suburb": "Kelso",
+   "dogs": 1542,
+   "dogs_desexed": 1270,
+   "cats": 255,
+   "cats_desexed": 235
+  },
+  {
+   "suburb": "Kirwan",
+   "dogs": 2402,
+   "dogs_desexed": 2074,
+   "cats": 525,
+   "cats_desexed": 462
+  },
+  {
+   "suburb": "Majors Creek",
+   "dogs": 18,
+   "dogs_desexed": 14,
+   "cats": 3,
+   "cats_desexed": 2
+  },
+  {
+   "suburb": "Mount Louisa",
+   "dogs": 1064,
+   "dogs_desexed": 919,
+   "cats": 207,
+   "cats_desexed": 179
+  },
+  {
+   "suburb": "Mount Low",
+   "dogs": 673,
+   "dogs_desexed": 561,
+   "cats": 106,
+   "cats_desexed": 89
+  },
+  {
+   "suburb": "Mount St John",
+   "dogs": 11,
+   "dogs_desexed": 8,
+   "cats": 0,
+   "cats_desexed": 0
+  },
+  {
+   "suburb": "Mundingburra",
+   "dogs": 401,
+   "dogs_desexed": 346,
+   "cats": 86,
+   "cats_desexed": 74
+  },
+  {
+   "suburb": "Murray",
+   "dogs": 1,
+   "dogs_desexed": 1,
+   "cats": 0,
+   "cats_desexed": 0
+  },
+  {
+   "suburb": "Mutarnee",
+   "dogs": 12,
+   "dogs_desexed": 6,
+   "cats": 2,
+   "cats_desexed": 2
+  },
+  {
+   "suburb": "Mysterton",
+   "dogs": 128,
+   "dogs_desexed": 117,
+   "cats": 19,
+   "cats_desexed": 17
+  },
+  {
+   "suburb": "Nelly Bay",
+   "dogs": 131,
+   "dogs_desexed": 111,
+   "cats": 31,
+   "cats_desexed": 28
+  },
+  {
+   "suburb": "Nome",
+   "dogs": 135,
+   "dogs_desexed": 118,
+   "cats": 8,
+   "cats_desexed": 8
+  },
+  {
+   "suburb": "North Ward",
+   "dogs": 320,
+   "dogs_desexed": 291,
+   "cats": 99,
+   "cats_desexed": 89
+  },
+  {
+   "suburb": "Oak Valley",
+   "dogs": 46,
+   "dogs_desexed": 42,
+   "cats": 1,
+   "cats_desexed": 1
+  },
+  {
+   "suburb": "Oonoonba",
+   "dogs": 257,
+   "dogs_desexed": 225,
+   "cats": 74,
+   "cats_desexed": 65
+  },
+  {
+   "suburb": "Pallarenda",
+   "dogs": 123,
+   "dogs_desexed": 105,
+   "cats": 22,
+   "cats_desexed": 18
+  },
+  {
+   "suburb": "Paluma",
+   "dogs": 3,
+   "dogs_desexed": 3,
+   "cats": 0,
+   "cats_desexed": 0
+  },
+  {
+   "suburb": "Picnic Bay",
+   "dogs": 51,
+   "dogs_desexed": 44,
+   "cats": 10,
+   "cats_desexed": 10
+  },
+  {
+   "suburb": "Pimlico",
+   "dogs": 232,
+   "dogs_desexed": 206,
+   "cats": 73,
+   "cats_desexed": 71
+  },
+  {
+   "suburb": "Pinnacles",
+   "dogs": 0,
+   "dogs_desexed": 0,
+   "cats": 4,
+   "cats_desexed": 4
+  },
+  {
+   "suburb": "Railway Estate",
+   "dogs": 370,
+   "dogs_desexed": 332,
+   "cats": 53,
+   "cats_desexed": 50
+  },
+  {
+   "suburb": "Rangewood",
+   "dogs": 170,
+   "dogs_desexed": 149,
+   "cats": 24,
+   "cats_desexed": 23
+  },
+  {
+   "suburb": "Rasmussen",
+   "dogs": 603,
+   "dogs_desexed": 501,
+   "cats": 135,
+   "cats_desexed": 125
+  },
+  {
+   "suburb": "Reid River",
+   "dogs": 6,
+   "dogs_desexed": 5,
+   "cats": 2,
+   "cats_desexed": 2
+  },
+  {
+   "suburb": "Rollingstone",
+   "dogs": 15,
+   "dogs_desexed": 8,
+   "cats": 3,
+   "cats_desexed": 3
+  },
+  {
+   "suburb": "Roseneath",
+   "dogs": 37,
+   "dogs_desexed": 26,
+   "cats": 0,
+   "cats_desexed": 0
+  },
+  {
+   "suburb": "Rosslea",
+   "dogs": 195,
+   "dogs_desexed": 169,
+   "cats": 50,
+   "cats_desexed": 47
+  },
+  {
+   "suburb": "Rowes Bay",
+   "dogs": 54,
+   "dogs_desexed": 52,
+   "cats": 8,
+   "cats_desexed": 7
+  },
+  {
+   "suburb": "Saunders Beach",
+   "dogs": 70,
+   "dogs_desexed": 58,
+   "cats": 8,
+   "cats_desexed": 6
+  },
+  {
+   "suburb": "Shaw",
+   "dogs": 112,
+   "dogs_desexed": 97,
+   "cats": 21,
+   "cats_desexed": 19
+  },
+  {
+   "suburb": "South Townsville",
+   "dogs": 238,
+   "dogs_desexed": 207,
+   "cats": 48,
+   "cats_desexed": 46
+  },
+  {
+   "suburb": "Stuart",
+   "dogs": 53,
+   "dogs_desexed": 49,
+   "cats": 8,
+   "cats_desexed": 7
+  },
+  {
+   "suburb": "Thuringowa Central",
+   "dogs": 214,
+   "dogs_desexed": 182,
+   "cats": 46,
+   "cats_desexed": 42
+  },
+  {
+   "suburb": "Toolakea",
+   "dogs": 28,
+   "dogs_desexed": 24,
+   "cats": 1,
+   "cats_desexed": 0
+  },
+  {
+   "suburb": "Toomulla",
+   "dogs": 40,
+   "dogs_desexed": 36,
+   "cats": 5,
+   "cats_desexed": 5
+  },
+  {
+   "suburb": "Toonpan",
+   "dogs": 4,
+   "dogs_desexed": 1,
+   "cats": 0,
+   "cats_desexed": 0
+  },
+  {
+   "suburb": "Townsville City",
+   "dogs": 142,
+   "dogs_desexed": 123,
+   "cats": 52,
+   "cats_desexed": 49
+  },
+  {
+   "suburb": "Vincent",
+   "dogs": 280,
+   "dogs_desexed": 241,
+   "cats": 64,
+   "cats_desexed": 54
+  },
+  {
+   "suburb": "West End",
+   "dogs": 450,
+   "dogs_desexed": 365,
+   "cats": 94,
+   "cats_desexed": 81
+  },
+  {
+   "suburb": "West Point",
+   "dogs": 4,
+   "dogs_desexed": 4,
+   "cats": 1,
+   "cats_desexed": 1
+  },
+  {
+   "suburb": "Woodstock",
+   "dogs": 19,
+   "dogs_desexed": 6,
+   "cats": 2,
+   "cats_desexed": 2
+  },
+  {
+   "suburb": "Wulguru",
+   "dogs": 637,
+   "dogs_desexed": 520,
+   "cats": 123,
+   "cats_desexed": 114
+  },
+  {
+   "suburb": "Yabulu",
+   "dogs": 105,
+   "dogs_desexed": 91,
+   "cats": 14,
+   "cats_desexed": 14
+  }
+ ],
+ "top_breeds": {
+  "dog": [
+   [
+    "Maltese Terrier Cross",
+    1089
+   ],
+   [
+    "Border Collie",
+    1018
+   ],
+   [
+    "Staffordshire Bull Terrier Cross",
+    891
+   ],
+   [
+    "Staffordshire Bull Terrier",
+    823
+   ],
+   [
+    "Cattle",
+    809
+   ],
+   [
+    "Bull Arab Cross",
+    742
+   ],
+   [
+    "Kelpie Cross",
+    601
+   ],
+   [
+    "Jack Russell Terrier",
+    584
+   ]
+  ],
+  "cat": [
+   [
+    "Domestic Short Hair",
+    2961
+   ],
+   [
+    "Domestic Medium Hair",
+    291
+   ],
+   [
+    "Unknown - Cat",
+    199
+   ],
+   [
+    "Ragdoll",
+    194
+   ],
+   [
+    "Domestic Long Hair",
+    121
+   ],
+   [
+    "Burmese",
+    61
+   ],
+   [
+    "Ragdoll Cross",
+    61
+   ],
+   [
+    "Siamese Cross",
+    48
+   ]
+  ]
+ }
+}

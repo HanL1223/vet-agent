@@ -6,14 +6,15 @@ Guidance for Claude (and humans) working in this repo.
 
 A demo of a vet care-plan platform with two faces:
 
-- **Clinic dashboard** (`/clinic`): care-gap radar, reminders, plans, requests from owners.
+- **Clinic dashboard** (`/clinic`): care-gap radar, reminders, estimates, visit recaps, plans,
+  requests from owners, and a Local area tab from Australian open data.
 - **Owner app** (`/owner`): one page per pet the owner has. Sections: Costs (estimates and the year
-  ahead), Last visit, "Something not right?", First 90 days, Coming up and, for seniors, a weekly
-  check-in. The care agent sits beside them as "Ask". Branded as the clinic. See
+  ahead), Last visit, "Something not right?", Near you (open-data notices), First 90 days, Coming
+  up and, for seniors, a weekly check-in. The care agent sits beside them as "Ask". Branded as the clinic. See
   `docs/owner-pain-points.md` for why these sections.
 
 Requirements live in `docs/requirements.md` with IDs (CL-*, CG-*, AG-*, OW-*, CO-*, VR-*, TR-*,
-NP-*, HT-*, BR-*, PR-*).
+NP-*, HT-*, BR-*, OD-*, PR-*).
 Code docstrings and test names reference these IDs. Start there before changing behaviour.
 
 ## Commands
@@ -27,6 +28,7 @@ uv run vetagent                          # http://localhost:8000; creates .env o
 uv run vetagent --reload                 # auto-reload while coding
 uv run vetagent --reset                  # delete the SQLite file, then start (fresh demo)
 uv run pytest                            # tests
+uv run vetagent-open-data                # refresh the open-data snapshots in data/open/
 uv run ruff check src tests              # lint
 uv run ruff format src tests             # format
 uv add <package> / uv add --dev <pkg>    # dependencies (updates uv.lock; commit it)
@@ -66,6 +68,11 @@ web/ (static HTML/JS) -> api/ (FastAPI routes) -> services/ (use cases)
   `write_recap` (CL-8), rendered by `web/clinic-care.js`. Owners only see sent estimates.
 - `domain/triage.py` is demo content: each clinic's vets approve their own symptom list. Keep its
   red flags in step with `agent/safety.py` (AG-3).
+- Open data (`docs/open-data.md`): `integrations/open_data_refresh.py` fetches five public
+  Australian sources into aggregate snapshots in `data/open/`; `integrations/open_data.py`
+  reads them; rules in `domain/local_area.py` and `domain/labels.py`; `services/local_area.py`
+  feeds the clinic's Local area tab, the owner's Near you tile and the after-hours number. The
+  app never calls these APIs at runtime. Store aggregates only, keep attribution (OD-6).
 - `api/wiring.py` is the only place dependencies are chosen. Swap adapters there.
 - `web/` holds no business or agent logic; it renders what the API returns.
 

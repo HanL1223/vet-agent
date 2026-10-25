@@ -23,6 +23,7 @@ from vetagent.domain.estimates import Estimate, open_estimates, owner_price, sen
 from vetagent.domain.forecast import Forecast, forecast
 from vetagent.domain.models import GapType, Pet, Plan
 from vetagent.integrations.practice import PracticeSystem
+from vetagent.services.local_area import LocalAreaService
 from vetagent.store.sqlite import Store
 
 
@@ -35,11 +36,19 @@ class PetNotFound(LookupError):
 
 
 class HomeService:
-    def __init__(self, practice: PracticeSystem, store: Store, today: date, owner_id: str) -> None:
+    def __init__(
+        self,
+        practice: PracticeSystem,
+        store: Store,
+        today: date,
+        owner_id: str,
+        local: LocalAreaService | None = None,
+    ) -> None:
         self._practice = practice
         self._store = store
         self._today = today
         self._owner_id = owner_id
+        self._local = local  # open data about the clinic's area (OD-*); optional
 
     # Queries -----------------------------------------------------------------
     def pets(self) -> list[dict]:
@@ -65,12 +74,15 @@ class HomeService:
         stage = life_stage(pet, self._today)
         plan, member, year = self._year_ahead(pet)
         contact = self._practice.contact()
+        if self._local:
+            contact = self._local.contact(contact)
         return {
             "clinic": self._practice.clinic_name(),
             "contact": {
                 "phone": contact.phone,
                 "emergency_name": contact.emergency_name,
                 "emergency_phone": contact.emergency_phone,
+                "emergency_source": contact.emergency_source,
             },
             "pet": {
                 "id": pet.id,
@@ -82,6 +94,7 @@ class HomeService:
                 "plan": plan.name if member else None,
             },
             "triage": self._triage_options(pet),
+            "nearby": self._local.notices(pet) if self._local else [],
             "costs": {
                 "estimates": [self._estimate(e, plan if member else None) for e in self._open(pet)],
                 "year": year,

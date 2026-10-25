@@ -65,6 +65,25 @@
     .recap-head { display: flex; justify-content: space-between; gap: 12px; }
     .bad { color: var(--urgent); font-size: 13px; }
     .empty { padding: 28px 22px; }
+    .local { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 16px; align-items: start; }
+    .local .card { padding: 20px 22px; display: grid; gap: 12px; align-content: start; }
+    .local .wide { grid-column: 1 / -1; }
+    .stats { display: flex; flex-wrap: wrap; gap: 8px 28px; }
+    .stats b { display: block; font-family: "Fraunces", Georgia, serif; font-weight: 500; font-size: 26px; }
+    .bars { display: grid; grid-template-columns: repeat(12, 1fr); gap: 2px; align-items: end; height: 96px; border-bottom: 1px solid var(--rule); }
+    .bars span { background: var(--sage-tint); border-radius: 4px 4px 0 0; min-height: 2px; }
+    .bars span.season { background: #9db59f; }
+    .bars span.now { background: var(--sage); }
+    .bar-labels { display: grid; grid-template-columns: repeat(12, 1fr); gap: 2px; text-align: center; }
+    .meter { height: 6px; border-radius: 3px; background: var(--sunk); overflow: hidden; }
+    .meter span { display: block; height: 100%; background: var(--clay); border-radius: 3px; }
+    .outreach { display: grid; grid-template-columns: minmax(110px, 1fr) 2fr 48px; gap: 6px 12px; align-items: center; }
+    .days { display: grid; grid-template-columns: repeat(auto-fit, minmax(44px, 1fr)); gap: 6px; text-align: center; }
+    .days span { white-space: nowrap; }
+    .days b { display: block; font-size: 18px; }
+    .days .hot b { color: var(--clay); }
+    .label-row { display: grid; gap: 2px; padding-top: 10px; border-top: 1px solid var(--rule); }
+    .bad-strong { color: var(--urgent); font-weight: 700; }
     @media (max-width: 860px) {
       .kpis { grid-template-columns: 1fr 1fr; }
       .kpi:nth-child(3) { border-left: 0; }
@@ -98,6 +117,7 @@
       <button role="tab" data-tab="recaps" aria-selected="false">Visit recaps</button>
       <button role="tab" data-tab="plans" aria-selected="false">Care plans</button>
       <button role="tab" data-tab="requests" aria-selected="false">Requests</button>
+      <button role="tab" data-tab="local" aria-selected="false">Local area</button>
     </nav>
     <a href="/owner" class="small preview">Preview the owner app</a>
   </div>
@@ -167,9 +187,21 @@
     </div>
     <div class="card list" id="requests"></div>
   </section>
+
+  <section id="tab-local" hidden aria-labelledby="local-title">
+    <div class="section-head">
+      <div>
+        <h2 id="local-title" style="font-size: 22px">Local area</h2>
+        <p class="muted small" style="margin-top: 2px">Public Australian data about the pets and risks around the clinic. Refreshed with <code>uv run vetagent-open-data</code>.</p>
+      </div>
+    </div>
+    <div class="local" id="local"></div>
+    <p class="muted small note" id="local-sources"></p>
+  </section>
 </main>
 <script src="/static/common.js"></script>
 <script src="/static/clinic.js"></script>
 <script src="/static/clinic-care.js"></script>
+<script src="/static/clinic-local.js"></script>
 </body>
 </html>

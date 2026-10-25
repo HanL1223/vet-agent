@@ -6,10 +6,12 @@ from pathlib import Path
 
 from vetagent.agent.llm import ClaudeModel, Model, OpenAIModel, ScriptedModel
 from vetagent.config import Settings
-from vetagent.integrations.ezyvet import EzyVetPracticeSystem
+from vetagent.integrations.ezyvet import EzyVetPracticeSystem, load_config
+from vetagent.integrations.open_data import OpenData
 from vetagent.integrations.practice import PracticeSystem
 from vetagent.services.clinic import ClinicService
 from vetagent.services.home import HomeService
+from vetagent.services.local_area import LocalAreaService
 from vetagent.services.owner_agent import OwnerAgentService
 from vetagent.store.sqlite import Store
 
@@ -25,6 +27,7 @@ class Services:
     clinic: ClinicService
     owner_agent: OwnerAgentService
     home: HomeService
+    local: LocalAreaService
 
 
 def build_services(
@@ -36,10 +39,12 @@ def build_services(
     store = Store(settings.db_path)
     seed_demo_home(store)
     model = model or choose_model(settings)
+    local = LocalAreaService(OpenData(load_config()), practice, settings.today)
     return Services(
         clinic=ClinicService(practice, store, settings.today),
         owner_agent=OwnerAgentService(practice, store, model, settings.today, DEMO_OWNER_ID),
-        home=HomeService(practice, store, settings.today, DEMO_OWNER_ID),
+        home=HomeService(practice, store, settings.today, DEMO_OWNER_ID, local),
+        local=local,
     )
 
 

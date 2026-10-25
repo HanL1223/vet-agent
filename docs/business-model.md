@@ -131,6 +131,19 @@ premium modules.
 | **Home wellbeing trends** (senior check-ins) | Check-in | Early-decline flags; the chronic-care premium module |
 | **Intent** (what owners ask the assistant) | Ask | FAQ content, service design |
 
+**Public data we add on top** (free, Australian, attributed; `docs/open-data.md`):
+
+| Data | From | Use |
+| --- | --- | --- |
+| Pets registered per suburb, desexed or not | Council registrations (data.gov.au) | Catchment size for sales; where desexing outreach reaches most; new-site decisions |
+| Labels of registered parasite products | APVMA PubCRIS | Label check against the species each product was dispensed to; the base for the medication log |
+| Paralysis tick records by month | Atlas of Living Australia | Seasonal tick notices to owners, timed reminders for prevention |
+| Vets nearby, opening hours, emergency tag | OpenStreetMap | The after-hours number on "Call now"; local competition for sales |
+| 7-day forecast | Open-Meteo (a paid plan in production) | Hot-day notices for dog owners |
+
+They make the product useful on day one, before a clinic's own data has built up, and they are
+the same for every clinic in an area, so they don't depend on ezyVet access.
+
 **Rules that protect the data:**
 - Clinic records stay in ezyVet.
 - Sharing with the clinic is the owner's switch (PR-1); de-identified use is off by default
