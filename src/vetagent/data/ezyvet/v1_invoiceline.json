@@ -1,12 +1,45 @@
 {
   "meta": {
     "timestamp": 1793066400,
-    "items_page_size": 5,
+    "items_page_size": 11,
     "items_page": 1,
     "items_page_total": 1,
-    "items_total": 5
+    "items_total": 11
   },
   "items": [
+    {
+      "invoiceline": {
+        "id": "60006",
+        "animal_id": "1201",
+        "product_id": "303",
+        "name": "Heartworm injection",
+        "total": "160.00",
+        "created_at": 1751076000,
+        "wellness_plan_membership_id": null
+      }
+    },
+    {
+      "invoiceline": {
+        "id": "60007",
+        "animal_id": "1201",
+        "product_id": "302",
+        "name": "Flea and tick chew, 3-month",
+        "total": "96.00",
+        "created_at": 1754013600,
+        "wellness_plan_membership_id": null
+      }
+    },
+    {
+      "invoiceline": {
+        "id": "60008",
+        "animal_id": "1201",
+        "product_id": "302",
+        "name": "Flea and tick chew, 3-month",
+        "total": "96.00",
+        "created_at": 1762563600,
+        "wellness_plan_membership_id": null
+      }
+    },
     {
       "invoiceline": {
         "id": "60001",
@@ -14,7 +47,30 @@
         "name": "C5 vaccine and health check",
         "total": "120.00",
         "created_at": 1768352400,
-        "wellness_plan_membership_id": "41"
+        "wellness_plan_membership_id": "41",
+        "product_id": null
+      }
+    },
+    {
+      "invoiceline": {
+        "id": "60009",
+        "animal_id": "1201",
+        "product_id": "302",
+        "name": "Flea and tick chew, 3-month",
+        "total": "96.00",
+        "created_at": 1770253200,
+        "wellness_plan_membership_id": null
+      }
+    },
+    {
+      "invoiceline": {
+        "id": "60010",
+        "animal_id": "1201",
+        "product_id": "302",
+        "name": "Flea and tick chew, 3-month",
+        "total": "96.00",
+        "created_at": 1781920800,
+        "wellness_plan_membership_id": null
       }
     },
     {
@@ -24,7 +80,8 @@
         "name": "Heartworm injection",
         "total": "160.00",
         "created_at": 1782784800,
-        "wellness_plan_membership_id": "41"
+        "wellness_plan_membership_id": "41",
+        "product_id": "303"
       }
     },
     {
@@ -34,7 +91,8 @@
         "name": "Consult: front leg strain",
         "total": "92.00",
         "created_at": 1786672800,
-        "wellness_plan_membership_id": "41"
+        "wellness_plan_membership_id": "41",
+        "product_id": null
       }
     },
     {
@@ -44,7 +102,19 @@
         "name": "Parasite treatment deliveries",
         "total": "40.00",
         "created_at": 1788228000,
-        "wellness_plan_membership_id": "41"
+        "wellness_plan_membership_id": "41",
+        "product_id": null
+      }
+    },
+    {
+      "invoiceline": {
+        "id": "60011",
+        "animal_id": "1201",
+        "product_id": "302",
+        "name": "Flea and tick chew, 3-month",
+        "total": "96.00",
+        "created_at": 1789696800,
+        "wellness_plan_membership_id": null
       }
     },
     {
@@ -54,7 +124,8 @@
         "name": "Consultation, standard",
         "total": "92.00",
         "created_at": 1757642400,
-        "wellness_plan_membership_id": null
+        "wellness_plan_membership_id": null,
+        "product_id": null
       }
     }
   ]

@@ -95,6 +95,37 @@ class OwnerAgentService:
         self._store.set_consent(self._owner_id, Consent(share_log, deidentified_use))
         return self.conversation()
 
+    def propose_checkup(self) -> dict:
+        """HT-2: the dashboard's "Ask for a check-up" becomes a booking proposal (AG-4)."""
+        pet = self._practice.pet(self._ctx.pet_id).name
+        args = {
+            "reason": f"Check-up: {pet}'s home check-ins have dropped",
+            "preferred_time": "next available",
+        }
+        output = run_tool("propose_booking", args, self._ctx)
+        for message in (
+            {"role": "user", "text": f"Ask for a check-up for {pet}"},
+            {
+                "role": "assistant",
+                "text": "",
+                "tool_calls": [{"id": "checkup", "name": "propose_booking", "args": args}],
+            },
+            {
+                "role": "tool",
+                "tool_call_id": "checkup",
+                "name": "propose_booking",
+                "result": output.result,
+                "card": output.card,
+            },
+            {
+                "role": "assistant",
+                "text": f"I've drafted a check-up request with {pet}'s recent check-ins in mind. "
+                "Nothing goes to the clinic until you tap send.",
+            },
+        ):
+            self._store.append_message(self._owner_id, message)
+        return self.conversation()
+
     def reset(self) -> dict:
         self._store.clear_conversation(self._owner_id)
         return self.conversation()

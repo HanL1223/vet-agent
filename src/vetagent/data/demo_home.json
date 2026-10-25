@@ -1,0 +1,84 @@
+{
+  "1201": [
+    {
+      "week": "2026-W36",
+      "scores": {
+        "appetite": 4,
+        "energy": 3,
+        "mobility": 4,
+        "comfort": 4,
+        "toileting": 4
+      }
+    },
+    {
+      "week": "2026-W37",
+      "scores": {
+        "appetite": 4,
+        "energy": 3,
+        "mobility": 4,
+        "comfort": 3,
+        "toileting": 4
+      }
+    },
+    {
+      "week": "2026-W38",
+      "scores": {
+        "appetite": 4,
+        "energy": 4,
+        "mobility": 4,
+        "comfort": 4,
+        "toileting": 4
+      }
+    },
+    {
+      "week": "2026-W39",
+      "scores": {
+        "appetite": 4,
+        "energy": 3,
+        "mobility": 4,
+        "comfort": 4,
+        "toileting": 4
+      }
+    },
+    {
+      "week": "2026-W40",
+      "scores": {
+        "appetite": 4,
+        "energy": 3,
+        "mobility": 4,
+        "comfort": 4,
+        "toileting": 4
+      }
+    },
+    {
+      "week": "2026-W41",
+      "scores": {
+        "appetite": 4,
+        "energy": 3,
+        "mobility": 4,
+        "comfort": 3,
+        "toileting": 4
+      }
+    },
+    {
+      "week": "2026-W42",
+      "scores": {
+        "appetite": 4,
+        "energy": 3,
+        "mobility": 2,
+        "comfort": 3,
+        "toileting": 4
+      }
+    },
+    {
+      "week": "2026-W43",
+      "scores": {
+        "appetite": 3,
+        "energy": 2,
+        "mobility": 2,
+        "comfort": 3,
+        "toileting": 4
+      }
+    }
+  ]
+}

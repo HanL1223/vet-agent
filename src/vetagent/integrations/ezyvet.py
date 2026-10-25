@@ -14,7 +14,15 @@ from pathlib import Path
 from typing import Any, Protocol
 from zoneinfo import ZoneInfo
 
-from vetagent.domain.models import BenefitUse, CareEvent, Membership, Owner, Pet, Plan
+from vetagent.domain.models import (
+    BenefitUse,
+    CareEvent,
+    Membership,
+    Owner,
+    ParasiteProduct,
+    Pet,
+    Plan,
+)
 
 DEMO_DIR = Path(__file__).resolve().parent.parent / "data" / "ezyvet"
 
@@ -87,6 +95,13 @@ class EzyVetPracticeSystem:
     def benefit_uses(self, pet_id: str) -> list[BenefitUse]:
         return [u for u in self._uses if u.pet_id == pet_id]
 
+    def parasite_products(self) -> list[ParasiteProduct]:
+        return [
+            ParasiteProduct(g["label"], g["lasts_days"], g.get("owner_given", False))
+            for g in self._config["care_groups"].values()
+            if g["type"] == "parasite"
+        ]
+
     # --- Reading ---------------------------------------------------------------------
 
     def _read_clinic(self, source: EzyVetSource) -> None:
@@ -133,6 +148,7 @@ class EzyVetPracticeSystem:
                     detail=consult.get("description") or "",
                 )
             )
+        events += self._dispensed(source.list("v1/invoiceline"))
         for status in source.list("v1/healthstatus"):
             if status.get("weight"):
                 events.append(
@@ -143,7 +159,32 @@ class EzyVetPracticeSystem:
                         kg=float(status["weight"]),
                     )
                 )
-        self._events = [e for e in events if e.pet_id in self._pets]
+        # The latest dispense is often in both standard of care and an invoice line.
+        unique = dict.fromkeys(e for e in events if e.pet_id in self._pets)
+        self._events = list(unique)
+
+    def _dispensed(self, lines: list[dict]) -> list[CareEvent]:
+        """Parasite products on invoice lines: the dispensing history behind cover (HT-5)."""
+        by_product = {
+            g["product_id"]: g
+            for g in self._config["care_groups"].values()
+            if g["type"] == "parasite" and g.get("product_id")
+        }
+        events = []
+        for line in lines:
+            group = by_product.get(str(line.get("product_id")))
+            if group:
+                events.append(
+                    CareEvent(
+                        str(line["animal_id"]),
+                        "parasite",
+                        self._date(line["created_at"]),
+                        detail=group["label"],
+                        repeat_days=group["lasts_days"],
+                        price_key=group["price_key"],
+                    )
+                )
+        return events
 
     def _care_events(self, record: dict, group: dict) -> list[CareEvent]:
         """One standard-of-care record -> the events the care-gap rules read."""

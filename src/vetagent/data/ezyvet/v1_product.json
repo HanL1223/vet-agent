@@ -1,10 +1,10 @@
 {
   "meta": {
     "timestamp": 1793066400,
-    "items_page_size": 5,
+    "items_page_size": 6,
     "items_page": 1,
     "items_page_total": 1,
-    "items_total": 5
+    "items_total": 6
   },
   "items": [
     {
@@ -19,7 +19,7 @@
       "product": {
         "id": "302",
         "active": true,
-        "name": "Parasite prevention, 3-month dose",
+        "name": "Flea and tick chew, 3-month",
         "price": "96.00"
       }
     },
@@ -45,6 +45,14 @@
         "active": true,
         "name": "Dental scale and polish (GA)",
         "price": "650.00"
+      }
+    },
+    {
+      "product": {
+        "id": "306",
+        "active": true,
+        "name": "Worming tablet, 3-month",
+        "price": "96.00"
       }
     }
   ]

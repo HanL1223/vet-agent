@@ -1,7 +1,8 @@
 """Care-gap rules (docs/requirements.md CG-1 to CG-6).
 
 Pure functions: given a pet, its events, a price list and today's date, return open gaps.
-Each rule returns a `_Due` (what is due and when); `find_gaps` decides the status.
+Each rule returns a `Due` (what is due, when, and how often it repeats); `find_gaps` decides
+the status. The 12-month forecast (HT-4) projects the same `Due`s forward.
 """
 
 from collections.abc import Iterable
@@ -16,17 +17,17 @@ YEAR = timedelta(days=365)
 
 
 @dataclass(frozen=True)
-class _Due:
+class Due:
     type: GapType
     title: str
     reason: str
     due_date: date
     value: int
+    every_days: int | None = None  # None: happens once
 
 
-def find_gaps(
-    pet: Pet, events: Iterable[CareEvent], prices: dict[str, int], today: date
-) -> list[CareGap]:
+def upcoming_care(pet: Pet, events: Iterable[CareEvent], prices: dict[str, int]) -> list[Due]:
+    """Everything the rules say is due next for this pet, whatever the date."""
     history = sorted((e for e in events if e.pet_id == pet.id), key=lambda e: e.date)
     dues = [
         _vaccination(history, prices),
@@ -34,11 +35,27 @@ def find_gaps(
         _senior_screening(pet, history, prices),
         _dental(history, prices),
     ]
+    return [d for d in dues if d]
+
+
+def find_gaps(
+    pet: Pet, events: Iterable[CareEvent], prices: dict[str, int], today: date
+) -> list[CareGap]:
     gaps = []
-    for due in dues:
-        status = _status(due.due_date, today) if due else None
+    for due in upcoming_care(pet, events, prices):
+        status = _status(due.due_date, today)
         if status:
-            gaps.append(CareGap(pet_id=pet.id, status=status, **due.__dict__))
+            gaps.append(
+                CareGap(
+                    pet_id=pet.id,
+                    type=due.type,
+                    title=due.title,
+                    reason=due.reason,
+                    due_date=due.due_date,
+                    status=status,
+                    value=due.value,
+                )
+            )
     return gaps
 
 
@@ -80,40 +97,42 @@ def _last(history: list[CareEvent], type_: str) -> CareEvent | None:
     return matches[-1] if matches else None
 
 
-def _vaccination(history: list[CareEvent], prices: dict[str, int]) -> _Due | None:
+def _vaccination(history: list[CareEvent], prices: dict[str, int]) -> Due | None:
     """CG-1: annual booster; no history means no gap."""
     last = _last(history, "vaccination")
     if last is None:
         return None
     vaccine = last.detail.split(" ")[0]
-    return _Due(
+    return Due(
         type=GapType.VACCINATION,
         title=f"{vaccine} vaccine booster",
         reason=f"Last {vaccine} on {short_date(last.date)} · annual schedule",
         due_date=last.date + YEAR,
         value=prices["vaccination"],
+        every_days=YEAR.days,
     )
 
 
-def _parasites(history: list[CareEvent], prices: dict[str, int]) -> list[_Due]:
+def _parasites(history: list[CareEvent], prices: dict[str, int]) -> list[Due]:
     """CG-2: each product repeats `repeat_days` after its latest dispense."""
     latest: dict[str, CareEvent] = {}
     for e in history:
         if e.type == "parasite" and e.repeat_days:
             latest[e.detail] = e
     return [
-        _Due(
+        Due(
             type=GapType.PARASITE,
             title=f"{e.detail} due",
             reason=f"Last dispensed {short_date(e.date)} · repeats every {e.repeat_days} days",
             due_date=e.date + timedelta(days=e.repeat_days),
             value=prices[e.price_key or "parasite_repeat"],
+            every_days=e.repeat_days,
         )
         for e in latest.values()
     ]
 
 
-def _senior_screening(pet: Pet, history: list[CareEvent], prices: dict[str, int]) -> _Due | None:
+def _senior_screening(pet: Pet, history: list[CareEvent], prices: dict[str, int]) -> Due | None:
     """CG-3: yearly screening from the senior birthday."""
     senior_age = SENIOR_AGE.get(pet.species)
     if senior_age is None:
@@ -126,23 +145,24 @@ def _senior_screening(pet: Pet, history: list[CareEvent], prices: dict[str, int]
     else:
         due = senior_from
         reason = f"Turns {senior_age} on {short_date(senior_from)} · starts senior care"
-    return _Due(
+    return Due(
         type=GapType.SENIOR,
         title="Senior health screening",
         reason=reason,
         due_date=due,
         value=prices["senior_screening"],
+        every_days=YEAR.days,
     )
 
 
-def _dental(history: list[CareEvent], prices: dict[str, int]) -> _Due | None:
+def _dental(history: list[CareEvent], prices: dict[str, int]) -> Due | None:
     """CG-4: a dental finding with no later dental procedure."""
     finding = next((e for e in reversed(history) if e.finding == "dental_recommended"), None)
     if finding is None:
         return None
     if any(e.type == "dental" and e.date >= finding.date for e in history):
         return None
-    return _Due(
+    return Due(
         type=GapType.DENTAL,
         title="Dental scale and polish",
         reason=f"{finding.detail} on {short_date(finding.date)} · not yet booked",

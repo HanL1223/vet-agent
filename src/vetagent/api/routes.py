@@ -4,9 +4,16 @@ from dataclasses import asdict
 
 from fastapi import APIRouter, HTTPException, Request
 
-from vetagent.api.schemas import ConsentRequest, MessageRequest, ReminderRequest
+from vetagent.api.schemas import (
+    CheckInRequest,
+    ConsentRequest,
+    DoseRequest,
+    MessageRequest,
+    ReminderRequest,
+)
 from vetagent.api.wiring import Services
 from vetagent.domain.models import GapType
+from vetagent.services.home import DashboardError
 from vetagent.services.owner_agent import ProposalError
 
 clinic = APIRouter(prefix="/api/clinic", tags=["clinic"])
@@ -83,6 +90,40 @@ def set_consent(request: Request, body: ConsentRequest) -> dict:
     return _services(request).owner_agent.set_consent(body.share_log, body.deidentified_use)
 
 
+@owner.post("/checkup")
+def checkup(request: Request) -> dict:
+    return _services(request).owner_agent.propose_checkup()
+
+
 @owner.post("/reset")
 def reset(request: Request) -> dict:
     return _services(request).owner_agent.reset()
+
+
+# Owner pet dashboard -------------------------------------------------------------
+
+
+@owner.get("/dashboard")
+def dashboard(request: Request) -> dict:
+    return _services(request).home.dashboard()
+
+
+@owner.get("/household")
+def household(request: Request) -> dict:
+    return {"species": _services(request).home.household()}
+
+
+@owner.post("/checkins")
+def check_in(request: Request, body: CheckInRequest) -> dict:
+    try:
+        return _services(request).home.check_in(body.scores)
+    except DashboardError as exc:
+        raise HTTPException(400, str(exc)) from exc
+
+
+@owner.post("/doses")
+def log_dose(request: Request, body: DoseRequest) -> dict:
+    try:
+        return _services(request).home.log_dose(body.product)
+    except DashboardError as exc:
+        raise HTTPException(400, str(exc)) from exc

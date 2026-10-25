@@ -1,4 +1,5 @@
-// Owner care agent: renders the conversation the API returns. No agent logic lives here.
+// Owner app, Ask panel: renders the conversation the API returns. No agent logic lives here.
+// dashboard.js renders the tiles; both share `api`, `send` and `showView`.
 
 const CHIPS = [
   "What's due?",
@@ -93,15 +94,10 @@ function renderItem(item) {
 function render() {
   if (!convo) {
     document.getElementById("chat").innerHTML = '<div class="typing">Loading...</div>';
-    document.getElementById("paw").innerHTML = PAW;
     return;
   }
   const pet = convo.pet;
   document.getElementById("clinic").textContent = convo.clinic;
-  document.getElementById("title").textContent = pet.name;
-  document.getElementById("pet-meta").textContent =
-    `${pet.breed} · ${pet.age} yrs · care assistant, not a vet`;
-  document.getElementById("avatar").innerHTML = petIcon(pet.species);
   document.getElementById("input").placeholder = `Ask about ${pet.name}...`;
   document.getElementById("mode").textContent = convo.model;
   document.getElementById("chat").innerHTML = convo.items.map(renderItem).join("") +
@@ -124,6 +120,8 @@ async function run(request) {
   } finally {
     busy = false;
     render();
+    // Chat actions (a logged weight, a consent change) can change the tiles.
+    document.dispatchEvent(new Event("conversation-changed"));
   }
 }
 
@@ -133,6 +131,16 @@ function setError(text) {
 
 function send(text) {
   run(() => api("/api/owner/messages", { method: "POST", body: { text } }));
+}
+
+// Phones show one view at a time; on wide screens both are always visible.
+function showView(name) {
+  document.querySelector(".layout").dataset.show = name;
+  for (const tab of document.querySelectorAll("[data-view]")) {
+    tab.setAttribute("aria-selected", String(tab.dataset.view === name));
+  }
+  const scroller = document.getElementById("chat-scroll");
+  scroller.scrollTop = scroller.scrollHeight; // a hidden panel can't scroll, so catch up now
 }
 
 function setConsent(change) {
@@ -157,6 +165,7 @@ document.getElementById("input").addEventListener("input", () => setError(""));
 document.addEventListener("click", (event) => {
   const el = event.target.closest("button");
   if (!el) return;
+  if (el.dataset.view) showView(el.dataset.view);
   if (el.dataset.chip) send(el.dataset.chip);
   if (el.dataset.confirm) run(() => api(`/api/owner/proposals/${el.dataset.confirm}/confirm`, { method: "POST" }));
   if (el.dataset.dismiss) run(() => api(`/api/owner/proposals/${el.dataset.dismiss}/dismiss`, { method: "POST" }));

@@ -7,7 +7,15 @@ API code.
 
 from typing import Protocol
 
-from vetagent.domain.models import BenefitUse, CareEvent, Membership, Owner, Pet, Plan
+from vetagent.domain.models import (
+    BenefitUse,
+    CareEvent,
+    Membership,
+    Owner,
+    ParasiteProduct,
+    Pet,
+    Plan,
+)
 
 
 class PracticeSystem(Protocol):
@@ -21,3 +29,4 @@ class PracticeSystem(Protocol):
     def plans(self) -> list[Plan]: ...
     def memberships(self) -> list[Membership]: ...
     def benefit_uses(self, pet_id: str) -> list[BenefitUse]: ...
+    def parasite_products(self) -> list[ParasiteProduct]: ...

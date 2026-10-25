@@ -46,6 +46,20 @@ CREATE TABLE IF NOT EXISTS reminders (
     gap_key TEXT PRIMARY KEY,
     sent_at TEXT NOT NULL
 );
+CREATE TABLE IF NOT EXISTS checkins (
+    pet_id TEXT NOT NULL,
+    week TEXT NOT NULL,
+    scores TEXT NOT NULL,
+    created_at TEXT NOT NULL,
+    PRIMARY KEY (pet_id, week)
+);
+CREATE TABLE IF NOT EXISTS owner_doses (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    pet_id TEXT NOT NULL,
+    product TEXT NOT NULL,
+    given_on TEXT NOT NULL,
+    created_at TEXT NOT NULL
+);
 """
 
 
@@ -165,6 +179,34 @@ class Store:
 
     def reminded_keys(self) -> set[str]:
         return {r["gap_key"] for r in self._db.execute("SELECT gap_key FROM reminders")}
+
+    # Weekly check-ins (HT-1): one per pet per ISO week, the latest replaces it -----
+    def save_checkin(self, pet_id: str, week: str, scores: dict[str, int]) -> None:
+        self._exec(
+            "INSERT INTO checkins (pet_id, week, scores, created_at) VALUES (?, ?, ?, ?)"
+            " ON CONFLICT(pet_id, week) DO UPDATE SET"
+            " scores = excluded.scores, created_at = excluded.created_at",
+            (pet_id, week, json.dumps(scores), _now()),
+        )
+
+    def checkins(self, pet_id: str) -> list[tuple[str, dict[str, int]]]:
+        rows = self._db.execute(
+            "SELECT week, scores FROM checkins WHERE pet_id = ? ORDER BY week", (pet_id,)
+        ).fetchall()
+        return [(r["week"], json.loads(r["scores"])) for r in rows]
+
+    # Doses the owner gave at home (HT-6); never written back to the clinic -------
+    def log_dose(self, pet_id: str, product: str, given_on: str) -> None:
+        self._exec(
+            "INSERT INTO owner_doses (pet_id, product, given_on, created_at) VALUES (?, ?, ?, ?)",
+            (pet_id, product, given_on, _now()),
+        )
+
+    def owner_doses(self, pet_id: str) -> list[tuple[str, str]]:
+        rows = self._db.execute(
+            "SELECT product, given_on FROM owner_doses WHERE pet_id = ? ORDER BY id", (pet_id,)
+        ).fetchall()
+        return [(r["product"], r["given_on"]) for r in rows]
 
     def _exec(self, sql: str, params: tuple) -> None:
         with self._db:

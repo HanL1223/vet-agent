@@ -20,7 +20,7 @@ async function loadSummary() {
     ["Care waiting to be booked", money(s.value_at_risk), `${s.reminders_sent} reminder${s.reminders_sent === 1 ? "" : "s"} sent`],
   ];
   document.getElementById("kpis").innerHTML = kpis.map(([label, value, note]) => `
-    <div class="kpi"><span class="muted small">${esc(label)}</span><b>${esc(value)}</b>
+    <div class="kpi"><span class="label">${esc(label)}</span><b>${esc(value)}</b>
     <span class="muted small">${esc(note)}</span></div>`).join("");
 }
 
@@ -40,6 +40,7 @@ async function loadGaps() {
         <div style="min-width: 0">
           <b>${esc(r.pet)}</b> ${r.member ? '<span class="pill">Plan member</span>' : ""}
           <div class="muted small">${esc(r.breed)} · ${esc(r.owner)}</div>
+          ${r.home_note ? `<span class="pill clay">${esc(r.home_note)}</span>` : ""}
         </div>
       </div>
       <div class="what"><div style="font-weight: 700">${esc(r.title)}</div>
@@ -114,7 +115,7 @@ document.addEventListener("click", async (event) => {
   }
 });
 
-document.getElementById("logo").innerHTML = PAW;
+paintMark("[data-mark]");
 renderFilters();
 loadSummary();
 loadGaps();

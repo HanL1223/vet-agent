@@ -1,10 +1,10 @@
 {
   "meta": {
     "timestamp": 1793066400,
-    "items_page_size": 16,
+    "items_page_size": 17,
     "items_page": 1,
     "items_page_total": 1,
-    "items_total": 16
+    "items_total": 17
   },
   "items": [
     {
@@ -228,6 +228,20 @@
         },
         "last_fulfilled_at": 1740877200,
         "due_at": 1772413200,
+        "modified_at": 1793066400
+      }
+    },
+    {
+      "standardofcare": {
+        "id": "7017",
+        "animal_id": "1201",
+        "animal_uid": "A-1201",
+        "soc_group": {
+          "id": "26",
+          "name": "Flea and Tick"
+        },
+        "last_fulfilled_at": 1789696800,
+        "due_at": 1797469200,
         "modified_at": 1793066400
       }
     }

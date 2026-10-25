@@ -1,8 +1,9 @@
-"""Clinic dashboard use cases (docs/requirements.md CL-1 to CL-5)."""
+"""Clinic dashboard use cases (docs/requirements.md CL-1 to CL-6, HT-3)."""
 
 from dataclasses import dataclass
 from datetime import date
 
+from vetagent.domain import checkins as ci
 from vetagent.domain.care_gaps import due_label, find_gaps, rank_by_value
 from vetagent.domain.models import CareGap, GapStatus, GapType
 from vetagent.integrations.practice import PracticeSystem
@@ -24,6 +25,7 @@ class GapRow:
     overdue: bool
     value: int
     reminded: bool
+    home_note: str | None  # HT-3: set when shared home check-ins are dropping
 
 
 def gap_key(gap: CareGap) -> str:
@@ -69,9 +71,19 @@ class ClinicService:
                     overdue=gap.status is GapStatus.OVERDUE,
                     value=gap.value,
                     reminded=gap_key(gap) in reminded,
+                    home_note=self._home_note(pet.owner_id, pet.id),
                 )
             )
         return rows
+
+    def _home_note(self, owner_id: str, pet_id: str) -> str | None:
+        """HT-3: only when the owner shares their home log (PR-1)."""
+        if not self._store.consent(owner_id).share_log:
+            return None
+        trend = ci.trend([ci.CheckIn(w, s) for w, s in self._store.checkins(pet_id)])
+        if not trend.dropping:
+            return None
+        return f"Home check-ins: {'mobility' if trend.measure == 'mobility' else 'wellbeing'} down"
 
     def summary(self) -> dict:
         """CL-1."""
