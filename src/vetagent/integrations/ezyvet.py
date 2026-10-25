@@ -73,6 +73,9 @@ class EzyVetPracticeSystem:
     def lead_vet(self) -> str:
         return self._lead_vet
 
+    def vets(self) -> list[str]:
+        return sorted(set(self._vets.values()))
+
     def price_list(self) -> dict[str, int]:
         return dict(self._prices)
 

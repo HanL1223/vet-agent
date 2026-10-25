@@ -3,7 +3,8 @@
 Demo of a vet care-plan platform for independent clinics on ezyVet:
 
 - **Clinic dashboard**: a care-gap radar that ranks overdue care by value, one-click reminders,
-  care plans, and requests that owners sent from the agent.
+  estimates to check and send to owners, visit recaps to write and release, care plans, and
+  requests that owners sent from the app.
 - **Owner app**: a page per pet, branded as the clinic, built around the moments owners get stuck:
   - **Costs:** the clinic's estimates in plain language, with what the plan includes and the year
     ahead.
@@ -68,7 +69,10 @@ Mango (cockatiel) and Pip (9-week-old kitten).
 6. **Mango**: birds are asked to call the clinic rather than use the checker.
 7. **Biscuit, Weekly check-in**: mobility lower for two weeks. Do this week's check-in, or tap **Ask
    for a check-up**. In **Data** (shield icon), turn sharing off and the clinic's tag disappears.
-8. Back in the clinic dashboard, open **Requests** to see what Priya sent.
+8. Back in the clinic dashboard, open **Requests** to see what Priya sent, and **Estimates** to see
+   that she replied. Edit a line's wording and send again: her Costs section updates.
+9. **Visit recaps**: write one for Pip (patient, summary, an instruction with days, a result) and
+   release it. It appears under Last visit in Priya's app.
 
 The mark at the top left is one of Priya's pets, picked at random on each visit. *Start over*
 resets the current pet's conversation; `uv run vetagent --reset` wipes all demo state.

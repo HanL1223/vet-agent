@@ -6,7 +6,7 @@ judges whether a line is clinically needed.
 """
 
 from collections.abc import Iterable
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from datetime import date
 
 from vetagent.domain.models import Plan
@@ -69,3 +69,12 @@ def open_estimates(estimates: Iterable[Estimate], today: date) -> list[Estimate]
 
 def _sum(lines: list[EstimateLine]) -> Range:
     return Range(sum(line.low for line in lines), sum(line.high for line in lines))
+
+
+def sent_version(estimate: Estimate, explanations: dict[str, str]) -> Estimate:
+    """The estimate as the clinic sent it: their wording per line, by line number."""
+    lines = [
+        replace(line, explanation=explanations.get(str(i), line.explanation))
+        for i, line in enumerate(estimate.lines)
+    ]
+    return replace(estimate, lines=lines)

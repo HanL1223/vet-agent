@@ -27,7 +27,14 @@ CREATE TABLE IF NOT EXISTS clinic_requests (
     pet_id TEXT NOT NULL,
     kind TEXT NOT NULL,
     detail TEXT NOT NULL,
-    created_at TEXT NOT NULL
+    created_at TEXT NOT NULL,
+    ref TEXT NOT NULL DEFAULT ''
+);
+CREATE TABLE IF NOT EXISTS estimate_releases (
+    estimate_id TEXT PRIMARY KEY,
+    pet_id TEXT NOT NULL,
+    explanations TEXT NOT NULL,
+    released_at TEXT NOT NULL
 );
 CREATE TABLE IF NOT EXISTS weight_logs (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -100,6 +107,7 @@ class Store:
         self._db = sqlite3.connect(path, check_same_thread=False)
         self._db.row_factory = sqlite3.Row
         self._db.executescript(SCHEMA)
+        self._add_missing_columns()
 
     # Conversation -----------------------------------------------------------
     def append_message(self, owner_id: str, message: dict[str, Any]) -> None:
@@ -145,10 +153,12 @@ class Store:
         self._exec("UPDATE proposals SET status = ? WHERE id = ?", (status, proposal_id))
 
     # Requests sent to the clinic ---------------------------------------------
-    def add_clinic_request(self, pet_id: str, kind: str, detail: str) -> None:
+    def add_clinic_request(self, pet_id: str, kind: str, detail: str, ref: str = "") -> None:
+        """`ref` links a request to what it answers, e.g. the estimate an owner replied to."""
         self._exec(
-            "INSERT INTO clinic_requests (pet_id, kind, detail, created_at) VALUES (?, ?, ?, ?)",
-            (pet_id, kind, detail, _now()),
+            "INSERT INTO clinic_requests (pet_id, kind, detail, created_at, ref)"
+            " VALUES (?, ?, ?, ?, ?)",
+            (pet_id, kind, detail, _now(), ref),
         )
 
     def clinic_requests(self) -> list[dict[str, Any]]:
@@ -226,6 +236,35 @@ class Store:
         ).fetchall()
         return [json.loads(r["payload"]) for r in rows]
 
+    def all_recaps(self) -> list[dict[str, Any]]:
+        """Every released recap, newest first, for the clinic's list (CL-8)."""
+        rows = self._db.execute(
+            "SELECT pet_id, payload, released_at FROM recaps ORDER BY released_at DESC, rowid DESC"
+        ).fetchall()
+        return [
+            {**json.loads(r["payload"]), "pet_id": r["pet_id"], "released_at": r["released_at"]}
+            for r in rows
+        ]
+
+    # Estimates the clinic sent to the owner (CL-7) -------------------------------
+    def release_estimate(self, estimate_id: str, pet_id: str, explanations: dict[str, str]) -> None:
+        self._exec(
+            "INSERT OR REPLACE INTO estimate_releases"
+            " (estimate_id, pet_id, explanations, released_at) VALUES (?, ?, ?, ?)",
+            (estimate_id, pet_id, json.dumps(explanations), _now()),
+        )
+
+    def estimate_releases(self) -> dict[str, dict[str, Any]]:
+        rows = self._db.execute("SELECT * FROM estimate_releases").fetchall()
+        return {
+            r["estimate_id"]: {
+                "pet_id": r["pet_id"],
+                "explanations": json.loads(r["explanations"]),
+                "released_at": r["released_at"],
+            }
+            for r in rows
+        }
+
     # Things the owner ticked off: recap instructions (VR-2), new-pet steps (NP-1) ---
     def set_tick(self, pet_id: str, item: str, done: bool) -> None:
         if done:
@@ -254,6 +293,12 @@ class Store:
             (pet_id,),
         ).fetchall()
         return [dict(r) for r in rows]
+
+    def _add_missing_columns(self) -> None:
+        # Databases created before `ref` existed get it added; new ones already have it.
+        columns = {r["name"] for r in self._db.execute("PRAGMA table_info(clinic_requests)")}
+        if "ref" not in columns:
+            self._exec("ALTER TABLE clinic_requests ADD COLUMN ref TEXT NOT NULL DEFAULT ''", ())
 
     def _exec(self, sql: str, params: tuple) -> None:
         with self._db:

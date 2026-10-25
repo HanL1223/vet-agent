@@ -1,10 +1,13 @@
-"""Clinic dashboard use cases (docs/requirements.md CL-1 to CL-6, HT-3)."""
+"""Clinic dashboard use cases (docs/requirements.md CL-1 to CL-8, HT-3)."""
 
+import uuid
 from dataclasses import dataclass
 from datetime import date
 
 from vetagent.domain import checkins as ci
+from vetagent.domain import recaps
 from vetagent.domain.care_gaps import due_label, find_gaps, rank_by_value
+from vetagent.domain.estimates import open_estimates
 from vetagent.domain.models import CareGap, GapStatus, GapType
 from vetagent.integrations.practice import PracticeSystem
 from vetagent.store.sqlite import Store
@@ -30,6 +33,10 @@ class GapRow:
 
 def gap_key(gap: CareGap) -> str:
     return f"{gap.pet_id}:{gap.type}:{gap.due_date.isoformat()}"
+
+
+class ClinicError(ValueError):
+    pass
 
 
 class ClinicService:
@@ -132,3 +139,114 @@ class ClinicService:
         return [
             {**r, "pet": names.get(r["pet_id"], r["pet_id"])} for r in self._store.clinic_requests()
         ]
+
+    # Estimates sent to owners (CL-7) ---------------------------------------------
+    def estimates(self) -> list[dict]:
+        """Open ezyVet estimates for current patients, newest first, and where each is up to."""
+        released = self._store.estimate_releases()
+        replies = {
+            r["ref"]: r for r in self._store.clinic_requests() if r["kind"] == "estimate_reply"
+        }
+        rows = []
+        for pet in self._practice.pets():
+            for e in open_estimates(self._practice.estimates(pet.id), self._today):
+                sent = released.get(e.id)
+                wording = sent["explanations"] if sent else {}
+                reply = replies.get(e.id)
+                rows.append(
+                    {
+                        "id": e.id,
+                        "pet": pet.name,
+                        "owner": self._practice.owner(pet.owner_id).name,
+                        "title": e.title,
+                        "vet": e.vet,
+                        "given": f"{e.created.day} {e.created:%b}",
+                        "valid_until": f"{e.expires.day} {e.expires:%b}",
+                        "low": sum(line.low for line in e.lines),
+                        "high": sum(line.high for line in e.lines),
+                        "lines": [
+                            {
+                                "name": line.name,
+                                "low": line.low,
+                                "high": line.high,
+                                "optional": line.optional,
+                                "explanation": wording.get(str(i), line.explanation),
+                            }
+                            for i, line in enumerate(e.lines)
+                        ],
+                        "status": "replied" if reply else "sent" if sent else "not_sent",
+                        "sent_at": sent["released_at"] if sent else None,
+                        "reply": reply["detail"] if reply else None,
+                        "created": e.created,
+                    }
+                )
+        rows.sort(key=lambda r: r.pop("created"), reverse=True)
+        return rows
+
+    def send_estimate(self, estimate_id: str, explanations: list[str]) -> dict:
+        """CL-7: the clinic checks each line's wording, then the owner can see it (CO-1)."""
+        for pet in self._practice.pets():
+            for e in open_estimates(self._practice.estimates(pet.id), self._today):
+                if e.id == estimate_id:
+                    if len(explanations) != len(e.lines):
+                        raise ClinicError("Give one explanation per line")
+                    if any(len(text) > 400 for text in explanations):
+                        raise ClinicError("Keep each explanation under 400 characters")
+                    wording = {str(i): text.strip() for i, text in enumerate(explanations)}
+                    self._store.release_estimate(e.id, pet.id, wording)
+                    return next(r for r in self.estimates() if r["id"] == estimate_id)
+        raise ClinicError("That estimate isn't open")
+
+    # Visit recaps (CL-8) ------------------------------------------------------------
+    def recap_options(self) -> dict:
+        return {
+            "patients": [
+                {
+                    "id": p.id,
+                    "name": p.name,
+                    "owner": self._practice.owner(p.owner_id).name,
+                    "species": p.species,
+                }
+                for p in sorted(self._practice.pets(), key=lambda p: p.name)
+            ],
+            "vets": self._practice.vets(),
+            "today": self._today.isoformat(),
+        }
+
+    def recaps(self) -> list[dict]:
+        names = {p.id: p.name for p in self._practice.pets()}
+        return [
+            {**r, "pet": names[r["pet_id"]]}
+            for r in self._store.all_recaps()
+            if r["pet_id"] in names
+        ]
+
+    def write_recap(self, pet_id: str, draft: dict) -> dict:
+        """CL-8: validate, then release to the owner's Last visit (VR-1)."""
+        if pet_id not in {p.id for p in self._practice.pets()}:
+            raise ClinicError("Choose a current patient")
+        if draft["vet"] not in self._practice.vets():
+            raise ClinicError("Choose one of the clinic's vets")
+        try:
+            recap = recaps.build(
+                recap_id=f"rc-{pet_id}-{uuid.uuid4().hex[:8]}",
+                pet_id=pet_id,
+                visit=date.fromisoformat(draft["visit"]),
+                vet=draft["vet"],
+                summary=draft["summary"],
+                instructions=[
+                    recaps.Instruction(i["text"], i.get("days")) for i in draft["instructions"]
+                ],
+                results=[
+                    recaps.Result(r["name"], r["status"], r["comment"]) for r in draft["results"]
+                ],
+                follow_up=draft.get("follow_up", ""),
+                follow_up_by=date.fromisoformat(draft["follow_up_by"])
+                if draft.get("follow_up_by")
+                else None,
+                today=self._today,
+            )
+        except ValueError as exc:
+            raise ClinicError(str(exc)) from exc
+        self._store.release_recap(recap.id, pet_id, recaps.to_record(recap))
+        return {**recaps.to_record(recap), "pet_id": pet_id}

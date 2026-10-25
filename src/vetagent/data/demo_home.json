@@ -114,5 +114,11 @@
         "follow_up_by": "2026-11-05"
       }
     ]
+  },
+  "estimate_releases": {
+    "5101": {
+      "pet_id": "1201",
+      "explanations": {}
+    }
   }
 }

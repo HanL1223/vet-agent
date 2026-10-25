@@ -16,7 +16,7 @@ from vetagent.store.sqlite import Store
 # The demo signs in as one owner (Priya: Biscuit, Mango and Pip). Real auth replaces this.
 # ezyVet contact and animal IDs from data/ezyvet/.
 DEMO_OWNER_ID = "501"
-# App-owned demo history (check-ins, a released visit recap) so the dashboard has a story.
+# App-owned demo data (check-ins, a released recap, a sent estimate) so the app has a story.
 DEMO_HOME = Path(__file__).resolve().parent.parent / "data" / "demo_home.json"
 
 
@@ -54,6 +54,10 @@ def seed_demo_home(store: Store, path: Path = DEMO_HOME) -> None:
         if not store.recaps(pet_id):
             for recap in recaps:
                 store.release_recap(recap["id"], pet_id, recap)
+    released = store.estimate_releases()
+    for estimate_id, sent in demo["estimate_releases"].items():
+        if estimate_id not in released:
+            store.release_estimate(estimate_id, sent["pet_id"], sent["explanations"])
 
 
 def choose_model(settings: Settings) -> Model:

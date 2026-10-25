@@ -61,7 +61,9 @@ web/ (static HTML/JS) -> api/ (FastAPI routes) -> services/ (use cases)
   clinic. Dashboard actions (estimate replies, triage requests, recap follow-ups, check-ups) go
   through `OwnerAgentService.propose_*`, so they land in Ask as proposals and AG-4 still holds.
 - Owner endpoints take `?pet=`; `HomeService.pet` refuses pets the owner doesn't have (OW-1).
-  `data/demo_home.json` seeds check-ins and a released visit recap.
+  `data/demo_home.json` seeds check-ins, a released visit recap and a sent estimate.
+- The clinic side writes what owners see: `ClinicService.send_estimate` (CL-7) and
+  `write_recap` (CL-8), rendered by `web/clinic-care.js`. Owners only see sent estimates.
 - `domain/triage.py` is demo content: each clinic's vets approve their own symptom list. Keep its
   red flags in step with `agent/safety.py` (AG-3).
 - `api/wiring.py` is the only place dependencies are chosen. Swap adapters there.
@@ -108,6 +110,6 @@ web/ (static HTML/JS) -> api/ (FastAPI routes) -> services/ (use cases)
 - Real ezyVet adapter and partner approval (IDEXX), CSV import for pilots. See `docs/ezyvet.md`.
 - Auth and multi-tenant clinics/owners (demo signs in as one owner, Priya `501`, with Biscuit,
   Mango and Pip).
-- Clinic-side recap editor and estimate publishing (the demo seeds both); medication log.
+- Estimates the clinic creates in the app (for when ezyVet has no estimate endpoint); medication log.
 - Reminder delivery (SMS/email), payments (Stripe direct debit), plan builder.
 - Evals for the Claude path: urgent-symptom recall, no-diagnosis checks, proposal-not-claimed checks.

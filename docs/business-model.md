@@ -176,19 +176,20 @@ premium modules.
 
 | Risk | Mitigation |
 | --- | --- |
-| No estimate endpoint, or slow ezyVet approval | CSV pilots; estimates can also be entered in our clinic dashboard |
+| No estimate endpoint, or slow ezyVet approval | CSV pilots; next, estimates created directly in our clinic dashboard |
 | Triage liability and vet nervousness | Routing only, never a condition; each clinic's vets approve the list; red flags always mean call now; urgent chat messages never reach the model (AG-3) |
 | "Is this upselling?" distrust | Clinic's own words, recommended and optional marked clearly, "ask for a cheaper option" built in, plan comparisons honest even when the plan costs more |
-| Clinics don't write recaps | The recap is a short template released in one click; it saves the callback it replaces |
+| Clinics don't write recaps | The Visit recaps tab is one short form, released in one click; it saves the callback it replaces |
 | Privacy | App-owned data only, consent switches, de-identification off by default |
 | Corporates copy it | Focus on independents; the decision and worry data is hard to copy |
 
 ## 12. Roadmap
 
-1. **Next:** the clinic-side recap editor and estimate publishing, then the **medication log**
+1. **Done:** the clinic-side recap editor and estimate sending (Estimates and Visit recaps tabs).
+2. **Next:** the **medication log**
    (pain point #2, refills kept at the clinic).
-2. **Year 2:** the senior and chronic premium module (validated mobility scales).
-3. **Later:** an emergency-readiness view (#7), end-of-life quality-of-life journal (#9), weight
+3. **Year 2:** the senior and chronic premium module (validated mobility scales).
+4. **Later:** an emergency-readiness view (#7), end-of-life quality-of-life journal (#9), weight
    programmes (#10).
 
 ## Sources

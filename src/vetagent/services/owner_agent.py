@@ -76,7 +76,8 @@ class OwnerAgentService:
             detail = payload["note"]
         action, title, after = CONFIRMED[proposal.kind]
         title = title or f"Sent to {self._practice.lead_vet()}"
-        self._store.add_clinic_request(payload["pet_id"], proposal.kind, detail)
+        ref = payload.get("estimate_id", "")
+        self._store.add_clinic_request(payload["pet_id"], proposal.kind, detail, ref)
         self._store.set_proposal_status(proposal_id, "confirmed")
         key = self._key(payload["pet_id"])
         self._store.append_message(key, {"role": "user", "text": action})

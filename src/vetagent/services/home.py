@@ -19,7 +19,7 @@ from vetagent.domain.care_gaps import (
     rank_by_value,
     upcoming_care,
 )
-from vetagent.domain.estimates import Estimate, open_estimates, owner_price
+from vetagent.domain.estimates import Estimate, open_estimates, owner_price, sent_version
 from vetagent.domain.forecast import Forecast, forecast
 from vetagent.domain.models import GapType, Pet, Plan
 from vetagent.integrations.practice import PracticeSystem
@@ -154,7 +154,14 @@ class HomeService:
         }
 
     def _open(self, pet: Pet) -> list[Estimate]:
-        return open_estimates(self._practice.estimates(pet.id), self._today)
+        """CO-1: open estimates the clinic has sent, in the clinic's own words (CL-7)."""
+        released = self._store.estimate_releases()
+        sent = [
+            sent_version(e, released[e.id]["explanations"])
+            for e in self._practice.estimates(pet.id)
+            if e.id in released
+        ]
+        return open_estimates(sent, self._today)
 
     def _estimate(self, estimate: Estimate, plan: Plan | None) -> dict:
         price = owner_price(estimate, plan)
@@ -325,28 +332,13 @@ class HomeService:
         return best, False
 
     def _recaps(self, pet_id: str) -> list[recaps.Recap]:
-        return [_recap(pet_id, r) for r in self._store.recaps(pet_id)]
+        return [recaps.from_record(pet_id, r) for r in self._store.recaps(pet_id)]
 
     def _tickable(self, pet_id: str) -> set[str]:
         keys = {key for key, _, _ in pathway.HOME_STEPS} | {"desexing"}
         for recap in self._recaps(pet_id):
             keys |= {f"{recap.id}:{i}" for i in range(len(recap.instructions))}
         return keys
-
-
-def _recap(pet_id: str, raw: dict) -> recaps.Recap:
-    follow_by = raw.get("follow_up_by")
-    return recaps.Recap(
-        id=raw["id"],
-        pet_id=pet_id,
-        visit=date.fromisoformat(raw["visit"]),
-        vet=raw["vet"],
-        summary=raw["summary"],
-        instructions=[recaps.Instruction(i["text"], i.get("days")) for i in raw["instructions"]],
-        results=[recaps.Result(r["name"], r["status"], r["comment"]) for r in raw["results"]],
-        follow_up=raw.get("follow_up", ""),
-        follow_up_by=date.fromisoformat(follow_by) if follow_by else None,
-    )
 
 
 def _month(day: date, today: date) -> str:

@@ -10,12 +10,15 @@ from vetagent.api.schemas import (
     EstimateReply,
     MessageRequest,
     QuestionRequest,
+    RecapDraft,
     ReminderRequest,
+    SendEstimate,
     TickRequest,
     TriageRequest,
 )
 from vetagent.api.wiring import Services
 from vetagent.domain.models import GapType
+from vetagent.services.clinic import ClinicError
 from vetagent.services.home import DashboardError, PetNotFound
 from vetagent.services.owner_agent import ProposalError
 
@@ -55,6 +58,35 @@ def plans(request: Request) -> list[dict]:
 @clinic.get("/requests")
 def requests_from_owners(request: Request) -> list[dict]:
     return _services(request).clinic.clinic_requests()
+
+
+@clinic.get("/estimates")
+def clinic_estimates(request: Request) -> list[dict]:
+    return _services(request).clinic.estimates()
+
+
+@clinic.post("/estimates/{estimate_id}/send")
+def send_estimate(request: Request, estimate_id: str, body: SendEstimate) -> dict:
+    return _clinic(lambda c: c.send_estimate(estimate_id, body.explanations), request)
+
+
+@clinic.get("/recaps")
+def clinic_recaps(request: Request) -> dict:
+    clinic_service = _services(request).clinic
+    return {"recaps": clinic_service.recaps(), **clinic_service.recap_options()}
+
+
+@clinic.post("/recaps")
+def write_recap(request: Request, body: RecapDraft) -> dict:
+    draft = body.model_dump(exclude={"pet_id"})
+    return _clinic(lambda c: c.write_recap(body.pet_id, draft), request)
+
+
+def _clinic(call, request: Request):
+    try:
+        return call(_services(request).clinic)
+    except ClinicError as exc:
+        raise HTTPException(400, str(exc)) from exc
 
 
 # Owner app: every call names the pet, and only the owner's own pets are allowed (OW-1) ----

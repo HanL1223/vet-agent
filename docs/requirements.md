@@ -12,6 +12,8 @@ Scope of the demo. Each requirement has an ID; code and tests reference these ID
 | CL-4 | Send a reminder for one gap, or for all gaps shown. A sent reminder is recorded and shown. |
 | CL-5 | Show the clinic's care plans with price, benefits and member count. |
 | CL-6 | Deceased or inactive patients are left out of every list, count and reminder. |
+| CL-7 | **Estimates tab.** Open ezyVet estimates for current patients, newest first, with where each is up to: not sent, sent to owner, or owner replied (with the reply). The clinic reviews the plain-language explanation of every line (pre-filled from `clinic_config.json`), then sends. Sending again updates the wording. One explanation per line, each under 400 characters. |
+| CL-8 | **Visit recaps tab.** The clinic writes a recap (patient, vet, visit date, plain-language summary, instructions with optional day counts, results with a status and the vet's comment, follow-up and date) and releases it to the owner's Last visit (VR-1). It is refused if the visit is in the future or over 60 days ago, the summary is empty, an instruction runs outside 1-90 days, a result lacks a name or comment, the vet or patient isn't the clinic's, or a follow-up date has no follow-up. Recently released recaps are listed. |
 
 ## Care-gap rules (shared engine)
 
@@ -45,7 +47,7 @@ contacts the clinic is a proposal the owner confirms (AG-4).
 | ID | Requirement |
 | --- | --- |
 | OW-1 | The owner sees each pet they registered and switches between them. Every owner call names the pet; another owner's pet is not found. Each pet has its own conversation. |
-| CO-1 | **Costs.** The clinic's open estimates show line by line: what each line is for (in the clinic's words), recommended or optional, and its price or price range. Expired estimates are not shown. |
+| CO-1 | **Costs.** Open estimates the clinic has sent (CL-7) show line by line: what each line is for (in the clinic's words), recommended or optional, and its price or price range. Expired estimates are not shown. |
 | CO-2 | Lines the pet's plan includes show as included and cost the owner nothing. Totals show what the owner pays for the recommended lines and with every option, plus the ways to pay the clinic offers. We take no payments. |
 | CO-3 | "Go ahead" (with any optional lines ticked), "Ask for a cheaper option" and "Ask a question" each create a proposal. The app explains lines but never says whether one is clinically needed. |
 | CO-4 | The year ahead (HT-4) sits with costs. Plans are compared only for pets they're meant for (life stage and species). |

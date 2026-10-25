@@ -89,9 +89,11 @@ function showTab(name) {
   for (const tab of document.querySelectorAll("[data-tab]")) {
     tab.setAttribute("aria-selected", String(tab.dataset.tab === name));
   }
-  for (const id of ["gaps", "plans", "requests"]) {
+  for (const id of ["gaps", "estimates", "recaps", "plans", "requests"]) {
     document.getElementById("tab-" + id).hidden = id !== name;
   }
+  if (name === "estimates") loadEstimates(); // clinic-care.js
+  if (name === "recaps") loadRecaps(); // clinic-care.js
   if (name === "plans") loadPlans();
   if (name === "requests") loadRequests();
 }
